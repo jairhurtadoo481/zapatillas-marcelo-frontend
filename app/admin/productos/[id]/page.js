@@ -23,7 +23,10 @@ export default function EditarProductoPage() {
   const { id } = useParams();
 
   const [form, setForm] = useState({
+    codigo: "",
+    sucursal: "sucursal1",
     nombre: "",
+    modeloBase: "",
     marca: "",
     descripcion: "",
     precio: "",
@@ -49,7 +52,10 @@ export default function EditarProductoPage() {
     try {
       const producto = await obtenerProductoPorId(id);
       setForm({
+        codigo: producto.codigo || "",
+        sucursal: producto.sucursal || "sucursal1",
         nombre: producto.nombre,
+        modeloBase: producto.modeloBase || "",
         marca: producto.marca,
         descripcion: producto.descripcion || "",
         precio: producto.precio,
@@ -112,7 +118,10 @@ export default function EditarProductoPage() {
         .map((t) => ({ talla: t.talla.trim(), stock: Number(t.stock) }));
 
       const payload = {
+        codigo: form.codigo.trim(),
+        sucursal: form.sucursal,
         nombre: form.nombre,
+        modeloBase: form.modeloBase.trim(),
         marca: form.marca,
         descripcion: form.descripcion,
         precio: Number(form.precio),
@@ -181,6 +190,25 @@ export default function EditarProductoPage() {
         </div>
 
         <form onSubmit={manejarSubmit} className="flex flex-col gap-4">
+          <div className="flex gap-3">
+            <input
+              name="codigo"
+              placeholder="Codigo / numero del par"
+              value={form.codigo}
+              onChange={manejarCambio}
+              className="border border-gray-300 rounded px-3 py-2 flex-1"
+            />
+            <select
+              name="sucursal"
+              value={form.sucursal}
+              onChange={manejarCambio}
+              className="border border-gray-300 rounded px-3 py-2"
+            >
+              <option value="sucursal1">Sucursal 1</option>
+              <option value="sucursal2">Sucursal 2</option>
+            </select>
+          </div>
+
           <input
             name="nombre"
             placeholder="Nombre"
@@ -188,6 +216,13 @@ export default function EditarProductoPage() {
             onChange={manejarCambio}
             className="border border-gray-300 rounded px-3 py-2"
             required
+          />
+          <input
+            name="modeloBase"
+            placeholder="Modelo base (para agrupar variantes)"
+            value={form.modeloBase}
+            onChange={manejarCambio}
+            className="border border-gray-300 rounded px-3 py-2"
           />
           <input
             name="marca"
@@ -354,9 +389,6 @@ export default function EditarProductoPage() {
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-1">
-                Para eliminar imagenes individuales lo haremos en un paso aparte.
-              </p>
             </div>
           )}
 
@@ -385,9 +417,6 @@ export default function EditarProductoPage() {
 
         <div className="mt-10 border-t border-gray-200 pt-6">
           <h2 className="text-lg font-semibold mb-4">Registrar venta rapida</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            Descuenta stock directamente sin tener que editar el numero a mano.
-          </p>
           {tallas
             .filter((t) => t.talla.trim() !== "")
             .map((t) => (

@@ -6,6 +6,11 @@ import ProtegerAdmin from "../../../components/ProtegerAdmin";
 import { obtenerProductos, eliminarProducto } from "../../../lib/api";
 import { obtenerToken } from "../../../lib/auth";
 
+const nombreSucursal = {
+  sucursal1: "Sucursal 1",
+  sucursal2: "Sucursal 2",
+};
+
 export default function AdminProductosPage() {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -81,7 +86,17 @@ export default function AdminProductosPage() {
               </div>
 
               <div className="flex-1">
-                <p className="text-xs text-gray-500 uppercase">{producto.marca}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {producto.codigo && (
+                    <span className="text-xs bg-black text-white px-2 py-0.5 rounded font-bold">
+                      #{producto.codigo}
+                    </span>
+                  )}
+                  <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded">
+                    {nombreSucursal[producto.sucursal] || "Sucursal 1"}
+                  </span>
+                  <p className="text-xs text-gray-500 uppercase">{producto.marca}</p>
+                </div>
                 <p className="font-semibold">{producto.nombre}</p>
                 <p className="text-sm text-gray-500">
                   {producto.categoria} / {producto.tipo} - S/ {producto.precio}

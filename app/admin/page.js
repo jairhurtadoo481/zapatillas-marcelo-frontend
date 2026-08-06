@@ -10,6 +10,8 @@ import { obtenerToken, eliminarToken } from "../../lib/auth";
 export default function AdminPage() {
   const router = useRouter();
   const [form, setForm] = useState({
+    codigo: "",
+    sucursal: "sucursal1",
     nombre: "",
     modeloBase: "",
     marca: "",
@@ -57,6 +59,8 @@ export default function AdminPage() {
         .map((t) => ({ talla: t.talla.trim(), stock: Number(t.stock) }));
 
       const payload = {
+        codigo: form.codigo.trim(),
+        sucursal: form.sucursal,
         nombre: form.nombre,
         modeloBase: form.modeloBase.trim(),
         marca: form.marca,
@@ -79,6 +83,8 @@ export default function AdminPage() {
 
       setMensaje("Producto creado correctamente");
       setForm({
+        codigo: "",
+        sucursal: "sucursal1",
         nombre: "",
         modeloBase: "",
         marca: "",
@@ -112,6 +118,9 @@ export default function AdminPage() {
             <Link href="/admin/reservas" className="text-sm text-blue-600 hover:underline">
               Ver reservas
             </Link>
+            <Link href="/admin/ventas" className="text-sm text-blue-600 hover:underline">
+              Ventas
+            </Link>
             <Link href="/admin/productos" className="text-sm text-blue-600 hover:underline">
               Ver productos
             </Link>
@@ -127,6 +136,30 @@ export default function AdminPage() {
         <h2 className="text-lg font-semibold mb-4">Crear producto</h2>
 
         <form onSubmit={manejarSubmit} className="flex flex-col gap-4">
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <input
+                name="codigo"
+                placeholder="Codigo / numero del par (ej: 1, 2, 3...)"
+                value={form.codigo}
+                onChange={manejarCambio}
+                className="border border-gray-300 rounded px-3 py-2 w-full"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                El mismo numero que pegaste en la nota fisica del par.
+              </p>
+            </div>
+            <select
+              name="sucursal"
+              value={form.sucursal}
+              onChange={manejarCambio}
+              className="border border-gray-300 rounded px-3 py-2"
+            >
+              <option value="sucursal1">Sucursal 1</option>
+              <option value="sucursal2">Sucursal 2</option>
+            </select>
+          </div>
+
           <input
             name="nombre"
             placeholder="Nombre"
