@@ -51,7 +51,7 @@ export default function AdminProductosPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Gestion de productos</h1>
           <Link
-            href="/admin"
+            href="/admin/productos/nuevo"
             className="text-sm bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
           >
             + Nuevo producto
