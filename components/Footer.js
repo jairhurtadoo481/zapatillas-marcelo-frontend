@@ -88,8 +88,8 @@ export default function Footer() {
 
         {/* Divider */}
         <div className="border-t-2 border-black pt-8">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-4 md:mb-0">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wider">
               © {currentYear} Zapatillas Marcelo. Todos los derechos reservados.
             </p>
             <div className="flex gap-6">
@@ -103,6 +103,17 @@ export default function Footer() {
                 <span className="text-sm font-semibold">WhatsApp</span>
               </Link>
             </div>
+          </div>
+
+          {/* Links discretos para admin y trabajador */}
+          <div className="mt-6 pt-6 border-t border-gray-300 flex justify-center gap-4">
+            <Link href="/admin/login" className="text-xs text-gray-400 hover:text-gray-600 transition underline">
+              Admin
+            </Link>
+            <span className="text-gray-300">•</span>
+            <Link href="/trabajador/login" className="text-xs text-gray-400 hover:text-gray-600 transition underline">
+              Trabajador
+            </Link>
           </div>
         </div>
       </div>

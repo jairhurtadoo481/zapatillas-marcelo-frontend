@@ -21,7 +21,7 @@ export default function Navbar() {
   const cerrarMenu = () => setMenuAbierto(false);
 
   return (
-    <header className="bg-white border-b-2 border-black sticky top-0 z-50 shadow-lg">
+    <header className="bg-white/80 backdrop-blur-md border-b border-black/20 text-black sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16 gap-4">
         <Link href="/" className="text-2xl font-bold tracking-wider text-black hover:text-gray-700 transition">
           Zapatillas Marcelo
@@ -33,7 +33,7 @@ export default function Navbar() {
             placeholder="Buscar zapatillas..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full rounded-lg px-4 py-2 text-sm text-black outline-none border-2 border-black focus:shadow-md transition"
+            className="w-full rounded-lg px-4 py-2 text-sm text-black outline-none border border-black/30 focus:border-black focus:shadow-md transition bg-white/90 backdrop-blur-sm"
           />
         </form>
 
@@ -74,14 +74,14 @@ export default function Navbar() {
       </div>
 
       {menuAbierto && (
-        <div className="md:hidden bg-white border-t-2 border-black px-4 py-4">
+        <div className="md:hidden bg-white/90 backdrop-blur-md border-t border-black/20 px-4 py-4">
           <form onSubmit={manejarBuscar} className="mb-4">
             <input
               type="text"
               placeholder="Buscar zapatillas..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full rounded-lg px-4 py-2 text-sm text-black outline-none border-2 border-black focus:shadow-md transition"
+              className="w-full rounded-lg px-4 py-2 text-sm text-black outline-none border border-black/30 focus:border-black focus:shadow-md transition bg-white/90 backdrop-blur-sm"
             />
           </form>
 

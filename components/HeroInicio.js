@@ -22,7 +22,7 @@ export default function HeroInicio() {
   }, []);
 
   return (
-    <section className="relative bg-black text-white overflow-hidden min-h-[600px] flex flex-col justify-center">
+    <section className="relative bg-black/50 backdrop-blur-sm text-white overflow-hidden min-h-[600px] flex flex-col justify-center">
       <div className="absolute inset-0">
         {IMAGENES.map((src, i) => (
           <img
@@ -30,11 +30,11 @@ export default function HeroInicio() {
             src={src}
             alt=""
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-              i === indice ? "opacity-70" : "opacity-0"
+              i === indice ? "opacity-100" : "opacity-0"
             }`}
           />
         ))}
-        <div className="absolute inset-0 bg-black/25" />
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       </div>
 
       <div className="relative max-w-5xl mx-auto px-4 py-28 md:py-36 text-center">

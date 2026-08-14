@@ -19,7 +19,7 @@ export default async function Home() {
       <HeroInicio />
       <MarcasDestacadas />
 
-      <section className="max-w-7xl mx-auto px-4 py-20 border-t-2 border-black">
+      <section className="max-w-7xl mx-auto px-4 py-20 border-t border-black/20 bg-white/50 backdrop-blur-sm">
         <h2 className="font-display text-4xl mb-2 font-bold">Destacados</h2>
         <p className="text-gray-500 text-sm mb-8 uppercase tracking-wide">Productos recomendados</p>
 

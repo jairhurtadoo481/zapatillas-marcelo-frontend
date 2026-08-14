@@ -36,7 +36,7 @@ export default function MarcasDestacadas() {
   }, []);
 
   return (
-    <section id="marcas" className="bg-white py-20 border-t-2 border-b-2 border-black" ref={contenedorRef}>
+    <section id="marcas" className="bg-white/80 backdrop-blur-md py-20 border-t border-b border-black/20" ref={contenedorRef}>
       <div className="max-w-6xl mx-auto px-4">
         <p className="text-center text-xs tracking-[0.3em] uppercase text-gray-400 mb-2">
           Trabajamos con
