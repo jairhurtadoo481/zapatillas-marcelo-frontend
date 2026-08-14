@@ -14,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body className={`${anton.variable} ${inter.variable} bg-white text-black`}>
+      <body className={`${anton.variable} ${inter.variable} bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white`}>
         <Navbar />
         <main>{children}</main>
         <Footer />

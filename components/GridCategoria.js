@@ -41,13 +41,13 @@ export default async function GridCategoria({ categoria, titulo, searchParams, v
           video ? "" : ""
         }`}
       >
-        <div className={video ? "bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8" : ""}>
+        <div className={video ? "bg-black/50 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 border border-white/20" : ""}>
           <FiltroBar />
 
-          {error && <p className="text-red-600">{error}</p>}
+          {error && <p className="text-red-400">{error}</p>}
 
           {!error && productos.length === 0 && (
-            <p className="text-gray-500">Aun no hay productos en esta categoria.</p>
+            <p className="text-gray-400">Aun no hay productos en esta categoria.</p>
           )}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">

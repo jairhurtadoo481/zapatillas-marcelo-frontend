@@ -27,14 +27,14 @@ export default function FiltroBar() {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-4 mb-8 bg-gray-50 p-4 rounded-lg border-2 border-black">
+    <div className="flex flex-wrap items-center gap-4 mb-8 bg-white/10 backdrop-blur-sm p-4 rounded-lg border-2 border-white">
       <div className="flex flex-wrap gap-2 flex-1">
         <button
           onClick={() => actualizarFiltro("tipo", "")}
           className={`text-sm px-4 py-2 rounded-lg border-2 font-semibold transition ${
             tipoActivo === ""
-              ? "bg-black text-white border-black shadow-md"
-              : "border-black text-black hover:bg-black hover:text-white"
+              ? "bg-white text-black border-white shadow-md"
+              : "border-white text-white hover:bg-white hover:text-black"
           }`}
         >
           Todos
@@ -45,8 +45,8 @@ export default function FiltroBar() {
             onClick={() => actualizarFiltro("tipo", tipo)}
             className={`text-sm px-4 py-2 rounded-lg border-2 font-semibold capitalize transition ${
               tipoActivo === tipo
-                ? "bg-black text-white border-black shadow-md"
-                : "border-black text-black hover:bg-black hover:text-white"
+                ? "bg-white text-black border-white shadow-md"
+                : "border-white text-white hover:bg-white hover:text-black"
             }`}
           >
             {tipo}
@@ -63,13 +63,13 @@ export default function FiltroBar() {
             actualizarFiltro("marca", e.target.value);
           }
         }}
-        className="text-sm border-2 border-black rounded-lg px-4 py-2 w-48 focus:outline-none focus:shadow-md transition font-medium"
+        className="text-sm border-2 border-white rounded-lg px-4 py-2 w-48 focus:outline-none focus:shadow-md transition font-medium bg-white/10 text-white placeholder-white/60"
       />
 
       {(tipoActivo || marcaActiva) && (
         <button
           onClick={limpiarFiltros}
-          className="text-sm font-semibold text-red-600 hover:text-red-800 hover:underline transition"
+          className="text-sm font-semibold text-red-400 hover:text-red-300 hover:underline transition"
         >
           ✕ Limpiar
         </button>

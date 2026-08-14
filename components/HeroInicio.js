@@ -51,7 +51,7 @@ export default function HeroInicio() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="#marcas"
-            className="border-2 border-black text-black px-8 py-3 text-sm tracking-wide uppercase font-semibold hover:bg-black hover:text-white transition rounded-lg"
+            className="border-2 border-white text-white px-8 py-3 text-sm tracking-wide uppercase font-semibold hover:bg-white hover:text-black transition rounded-lg"
           >
             Ver marcas
           </Link>

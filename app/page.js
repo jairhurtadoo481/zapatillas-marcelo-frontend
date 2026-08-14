@@ -19,9 +19,9 @@ export default async function Home() {
       <HeroInicio />
       <MarcasDestacadas />
 
-      <section className="max-w-7xl mx-auto px-4 py-20 border-t border-black/20 bg-white/50 backdrop-blur-sm">
-        <h2 className="font-display text-4xl mb-2 font-bold">Destacados</h2>
-        <p className="text-gray-500 text-sm mb-8 uppercase tracking-wide">Productos recomendados</p>
+      <section className="max-w-7xl mx-auto px-4 py-20 border-t border-white/20 bg-black/20 backdrop-blur-sm">
+        <h2 className="font-display text-4xl mb-2 font-bold text-white">Destacados</h2>
+        <p className="text-gray-400 text-sm mb-8 uppercase tracking-wide">Productos recomendados</p>
 
         {error && <p className="text-red-600">{error}</p>}
 

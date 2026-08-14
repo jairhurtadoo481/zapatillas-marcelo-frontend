@@ -12,7 +12,7 @@ export default function ProductoCard({ producto }) {
       href={`/producto/${producto._id}`}
       className="group block h-full"
     >
-      <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full hover:scale-105 border-2 border-black">
+      <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full hover:scale-105 border-2 border-white">
         <div className="aspect-square bg-gray-100 overflow-hidden relative flex-shrink-0">
           {imagen ? (
             <img

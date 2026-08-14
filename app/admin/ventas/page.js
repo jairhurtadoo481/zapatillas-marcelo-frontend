@@ -438,8 +438,8 @@ export default function VentasPage() {
         {filas.length > 0 && (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
-                <thead className="bg-gray-100 text-left">
+              <table className="w-full text-sm border border-gray-300 rounded-lg overflow-hidden text-gray-900">
+                <thead className="bg-gray-800 text-white text-left">
                   <tr>
                     <th className="p-2">Fecha</th>
                     <th className="p-2">Hora</th>
@@ -457,8 +457,8 @@ export default function VentasPage() {
                   {filas.map((f, i) => (
                     <tr
                       key={i}
-                      className={`border-t border-gray-100 align-top border-l-4 ${
-                        f.origen === "Compra web" ? "bg-blue-100 border-l-blue-600" : "bg-green-100 border-l-green-600"
+                      className={`border-t border-gray-300 align-top border-l-4 font-medium ${
+                        f.origen === "Compra web" ? "bg-blue-200 border-l-blue-700" : "bg-green-200 border-l-green-700"
                       }`}
                     >
                       <td className="p-2">{formatearFecha(f.fecha)}</td>
