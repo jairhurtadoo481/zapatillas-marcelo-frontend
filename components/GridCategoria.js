@@ -2,7 +2,7 @@ import { obtenerProductos } from "../lib/api";
 import ProductoCard from "./ProductoCard";
 import FiltroBar from "./FiltroBar";
 
-export default async function GridCategoria({ categoria, titulo, searchParams }) {
+export default async function GridCategoria({ categoria, titulo, searchParams, video }) {
   const params = { categoria, limit: 24 };
   if (searchParams?.tipo) params.tipo = searchParams.tipo;
   if (searchParams?.marca) params.marca = searchParams.marca;
@@ -18,21 +18,44 @@ export default async function GridCategoria({ categoria, titulo, searchParams })
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold mb-4">{titulo}</h1>
-
-      <FiltroBar />
-
-      {error && <p className="text-red-600">{error}</p>}
-
-      {!error && productos.length === 0 && (
-        <p className="text-gray-500">No hay productos con estos filtros.</p>
+    <div className="relative">
+      {video && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="fixed inset-0 w-full h-full object-cover -z-10"
+        >
+          <source src={video} type="video/mp4" />
+        </video>
       )}
+      {video && <div className="fixed inset-0 bg-black/30 -z-10" />}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {productos.map((producto) => (
-          <ProductoCard key={producto._id} producto={producto} />
-        ))}
+      <div className={`${video ? "text-white" : ""} py-24 md:py-32 text-center`}>
+        <h1 className="font-display text-5xl md:text-6xl tracking-wide">{titulo}</h1>
+      </div>
+
+      <div
+        className={`max-w-6xl mx-auto px-4 pb-20 ${
+          video ? "" : ""
+        }`}
+      >
+        <div className={video ? "bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8" : ""}>
+          <FiltroBar />
+
+          {error && <p className="text-red-600">{error}</p>}
+
+          {!error && productos.length === 0 && (
+            <p className="text-gray-500">Aun no hay productos en esta categoria.</p>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-8">
+            {productos.map((producto) => (
+              <ProductoCard key={producto._id} producto={producto} />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

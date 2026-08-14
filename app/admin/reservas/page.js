@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ProtegerAdmin from "../../../components/ProtegerAdmin";
 import { obtenerReservas, actualizarEstadoReserva } from "../../../lib/api";
@@ -14,17 +14,82 @@ const formatearFecha = (fecha) => {
   return d.toLocaleString("es-PE", { dateStyle: "short", timeStyle: "short" });
 };
 
-export default function AdminReservasPage() {
+const nombreMetodo = {
+  yape: "Yape",
+  plin: "Plin",
+};
+
+const nombreSucursal = {
+  sucursal1: "Sucursal 1",
+  sucursal2: "Sucursal 2",
+};
+
+const filtros = [
+  { valor: "todos", etiqueta: "Todos" },
+  { valor: "pendiente", etiqueta: "Pendiente" },
+  { valor: "atendido", etiqueta: "Atendido" },
+  { valor: "listo_recoger", etiqueta: "Listo para recoger" },
+  { valor: "suspendido", etiqueta: "Suspendido" },
+];
+
+const reproducirSonido = () => {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+
+    setTimeout(() => {
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(1100, ctx.currentTime);
+      gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc2.start();
+      osc2.stop(ctx.currentTime + 0.5);
+    }, 200);
+  } catch (e) {
+    // si el navegador bloquea audio automatico, lo ignoramos
+  }
+};
+
+export default function AdminComprasPage() {
   const [reservas, setReservas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [, forzarRender] = useState(0);
+  const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [filtroSucursal, setFiltroSucursal] = useState("todas");
+  const [avisoNueva, setAvisoNueva] = useState(null);
+
+  const idsConocidos = useRef(null);
 
   const cargar = async () => {
-    setCargando(true);
     try {
       const token = obtenerToken();
       const data = await obtenerReservas(token, false);
+
+      if (idsConocidos.current !== null) {
+        const nuevas = data.filter((r) => !idsConocidos.current.has(r._id));
+        if (nuevas.length > 0) {
+          reproducirSonido();
+          setAvisoNueva(`Nueva compra #${nuevas[0].numero} recibida!`);
+          setTimeout(() => setAvisoNueva(null), 6000);
+        }
+      }
+
+      idsConocidos.current = new Set(data.map((r) => r._id));
       setReservas(data);
     } catch (err) {
       setError(err.message);
@@ -35,7 +100,7 @@ export default function AdminReservasPage() {
 
   useEffect(() => {
     cargar();
-    const intervaloDatos = setInterval(cargar, 30000);
+    const intervaloDatos = setInterval(cargar, 15000);
     const intervaloReloj = setInterval(() => forzarRender((n) => n + 1), 10000);
     return () => {
       clearInterval(intervaloDatos);
@@ -66,17 +131,70 @@ export default function AdminReservasPage() {
   const colorEstado = {
     pendiente: "bg-yellow-100 text-yellow-700",
     atendido: "bg-blue-100 text-blue-700",
+    listo_recoger: "bg-purple-100 text-purple-700",
     suspendido: "bg-gray-200 text-gray-700",
+  };
+
+  const etiquetaEstado = {
+    pendiente: "pendiente",
+    atendido: "atendido",
+    listo_recoger: "listo para recoger",
+    suspendido: "suspendido",
+  };
+
+  const reservasFiltradas = reservas.filter((r) => {
+    if (filtroEstado !== "todos" && r.estado !== filtroEstado) return false;
+    if (filtroSucursal !== "todas" && !r.items.some((i) => i.sucursal === filtroSucursal)) return false;
+    return true;
+  });
+
+  const contarPorEstado = (estado) => {
+    if (estado === "todos") return reservas.length;
+    return reservas.filter((r) => r.estado === estado).length;
   };
 
   return (
     <ProtegerAdmin>
+      {avisoNueva && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg font-semibold animate-bounce">
+          {avisoNueva}
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Reservas</h1>
+          <h1 className="text-2xl font-bold">Compras</h1>
           <Link href="/admin/reservas/historial" className="text-sm text-blue-600 hover:underline">
             Ver historial
           </Link>
+        </div>
+
+        <div className="flex gap-2 mb-3 flex-wrap">
+          {filtros.map((f) => (
+            <button
+              key={f.valor}
+              onClick={() => setFiltroEstado(f.valor)}
+              className={`text-sm px-3 py-1.5 rounded-full border transition ${
+                filtroEstado === f.valor
+                  ? "bg-black text-white border-black"
+                  : "border-gray-300 text-gray-600 hover:border-black"
+              }`}
+            >
+              {f.etiqueta} ({contarPorEstado(f.valor)})
+            </button>
+          ))}
+        </div>
+
+        <div className="mb-4">
+          <select
+            value={filtroSucursal}
+            onChange={(e) => setFiltroSucursal(e.target.value)}
+            className="text-sm border border-gray-300 rounded px-3 py-2"
+          >
+            <option value="todas">Todas las sucursales</option>
+            <option value="sucursal1">Sucursal 1</option>
+            <option value="sucursal2">Sucursal 2</option>
+          </select>
         </div>
 
         <div className="flex gap-4 text-xs text-gray-500 mb-4">
@@ -94,22 +212,27 @@ export default function AdminReservasPage() {
         {cargando && <p className="text-gray-500">Cargando...</p>}
         {error && <p className="text-red-600">{error}</p>}
 
-        {!cargando && reservas.length === 0 && (
-          <p className="text-gray-500">No hay reservas pendientes.</p>
+        {!cargando && reservasFiltradas.length === 0 && (
+          <p className="text-gray-500">No hay compras con estos filtros.</p>
         )}
 
         <div className="flex flex-col gap-4">
-          {reservas.map((reserva) => (
+          {reservasFiltradas.map((reserva) => (
             <div
               key={reserva._id}
               className={`border rounded-lg p-4 ${claseParpadeo(reserva)}`}
             >
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <span className="font-bold">Reserva #{reserva.numero}</span>
+                  <span className="font-bold">Compra #{reserva.numero}</span>
                   <span className={`ml-2 text-xs px-2 py-0.5 rounded ${colorEstado[reserva.estado] || ""}`}>
-                    {reserva.estado}
+                    {etiquetaEstado[reserva.estado] || reserva.estado}
                   </span>
+                  {reserva.metodoPago && (
+                    <span className="ml-2 text-xs bg-black text-white px-2 py-0.5 rounded">
+                      {nombreMetodo[reserva.metodoPago] || reserva.metodoPago}
+                    </span>
+                  )}
                 </div>
                 <span className="text-sm text-gray-500">{formatearFecha(reserva.createdAt)}</span>
               </div>
@@ -126,39 +249,56 @@ export default function AdminReservasPage() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-2 mb-3">
-                {reserva.items.map((item, i) => (
-                  <Link
-                    key={i}
-                    href={`/producto/${item.producto}`}
-                    target="_blank"
-                    className="flex items-center gap-3 bg-gray-50 rounded p-2 hover:bg-gray-100 transition"
-                  >
-                    <div className="w-14 h-14 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                      {item.imagen ? (
-                        <img src={item.imagen} alt={item.nombre} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                          Sin foto
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-sm flex-1">
-                      <p className="font-semibold text-blue-700 hover:underline">{item.nombre}</p>
-                      <p className="text-gray-500">
-                        {item.cantidad}x - Talla {item.talla} - S/ {item.precioUnitario}
-                        {item.tieneOferta && <span className="text-red-600 font-semibold"> (Oferta)</span>}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-                <p className="font-bold">Total: S/ {reserva.total}</p>
-                {reserva.requierePagoCompleto && (
-                  <p className="text-red-600 text-xs font-semibold">Requiere pago completo (Yape personal)</p>
+              <div className="flex gap-4 mb-3">
+                <div className="flex flex-col gap-2 flex-1">
+                  {reserva.items.map((item, i) => (
+                    <Link
+                      key={i}
+                      href={`/producto/${item.producto}`}
+                      target="_blank"
+                      className="flex items-center gap-3 bg-gray-50 rounded p-2 hover:bg-gray-100 transition"
+                    >
+                      <div className="w-14 h-14 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                        {item.imagen ? (
+                          <img src={item.imagen} alt={item.nombre} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                            Sin foto
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-sm flex-1">
+                        <p className="font-semibold text-blue-700 hover:underline">{item.nombre}</p>
+                        <p className="text-gray-500">
+                          {item.cantidad}x - Talla {item.talla} - S/ {item.precioUnitario}
+                          {item.tieneOferta && <span className="text-red-600 font-semibold"> (Oferta)</span>}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {nombreSucursal[item.sucursal] || "Sucursal 1"}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {reserva.comprobante && (
+                  <a href={reserva.comprobante} target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+                    <p className="text-xs font-semibold mb-1 text-center">Comprobante</p>
+                    <img
+                      src={reserva.comprobante}
+                      alt="Comprobante de pago"
+                      className="w-24 h-24 object-cover rounded border-2 border-green-400 hover:opacity-80 transition"
+                    />
+                  </a>
                 )}
               </div>
 
-              <div className="flex gap-2">
+              <p className="font-bold">Total: S/ {reserva.total}</p>
+              {reserva.requierePagoCompleto && (
+                <p className="text-red-600 text-xs font-semibold mb-3">Requiere pago completo (producto en oferta)</p>
+              )}
+
+              <div className="flex gap-2 mt-3 flex-wrap">
                 <button
                   onClick={() => cambiarEstado(reserva._id, "atendido")}
                   className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
@@ -166,16 +306,22 @@ export default function AdminReservasPage() {
                   Atendido
                 </button>
                 <button
+                  onClick={() => cambiarEstado(reserva._id, "listo_recoger")}
+                  className="text-xs bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition"
+                >
+                  Listo para recoger
+                </button>
+                <button
+                  onClick={() => cambiarEstado(reserva._id, "entregado")}
+                  className="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                >
+                  Entregado
+                </button>
+                <button
                   onClick={() => cambiarEstado(reserva._id, "suspendido")}
                   className="text-xs bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition"
                 >
                   Suspendido
-                </button>
-                <button
-                  onClick={() => cambiarEstado(reserva._id, "compra_exitosa")}
-                  className="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
-                >
-                  Compra exitosa
                 </button>
               </div>
             </div>

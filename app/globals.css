@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+body {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-anton), sans-serif;
+}
+
+@keyframes marquesina {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marquesina {
+  animation: marquesina 30s linear infinite;
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal-item {
+  opacity: 0;
+}
+
+.reveal-item.visible {
+  animation: reveal-up 0.6s ease-out forwards;
+}
+
+@keyframes rebote-suave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.rebote {
+  animation: rebote-suave 1.8s ease-in-out infinite;
+}
+
 @keyframes parpadeo-verde {
   0%, 100% { border-color: rgb(34 197 94); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
   50% { border-color: rgb(134 239 172); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
@@ -28,4 +67,13 @@
 .parpadeo-rojo {
   animation: parpadeo-rojo 0.9s infinite;
   border-width: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquesina, .reveal-item.visible, .rebote {
+    animation: none !important;
+  }
+  .reveal-item {
+    opacity: 1;
+  }
 }

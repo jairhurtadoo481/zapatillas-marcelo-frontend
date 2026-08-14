@@ -7,9 +7,25 @@ import {
   obtenerProductoPorId,
   actualizarProducto,
   subirImagenesProducto,
+  eliminarImagenProducto,
   venderTalla,
 } from "../../../../lib/api";
 import { obtenerToken } from "../../../../lib/auth";
+
+const marcas = [
+  "Joma",
+  "Nike",
+  "Adidas",
+  "Puma",
+  "Lacoste",
+  "Punto Original",
+  "CRforward",
+  "VD-Dariems",
+  "New Athletic",
+  "Michelin",
+  "Underarmour",
+  "Nacionales (Marcelo)",
+];
 
 const aInputDatetime = (fecha) => {
   if (!fecha) return "";
@@ -27,7 +43,7 @@ export default function EditarProductoPage() {
     sucursal: "sucursal1",
     nombre: "",
     modeloBase: "",
-    marca: "",
+    marca: "Nike",
     descripcion: "",
     precio: "",
     categoria: "hombre",
@@ -43,6 +59,7 @@ export default function EditarProductoPage() {
   const [cantidadesVenta, setCantidadesVenta] = useState({});
   const [imagenesActuales, setImagenesActuales] = useState([]);
   const [nuevasImagenes, setNuevasImagenes] = useState([]);
+  const [eliminandoImagen, setEliminandoImagen] = useState(null);
   const [cargandoDatos, setCargandoDatos] = useState(true);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
@@ -56,7 +73,7 @@ export default function EditarProductoPage() {
         sucursal: producto.sucursal || "sucursal1",
         nombre: producto.nombre,
         modeloBase: producto.modeloBase || "",
-        marca: producto.marca,
+        marca: producto.marca && marcas.includes(producto.marca) ? producto.marca : "Nike",
         descripcion: producto.descripcion || "",
         precio: producto.precio,
         categoria: producto.categoria,
@@ -104,6 +121,22 @@ export default function EditarProductoPage() {
     setTallas(tallas.filter((_, i) => i !== index));
   };
 
+  const manejarEliminarImagen = async (url) => {
+    const confirmar = window.confirm("Eliminar esta imagen?");
+    if (!confirmar) return;
+
+    setEliminandoImagen(url);
+    try {
+      const token = obtenerToken();
+      await eliminarImagenProducto(token, id, url);
+      setImagenesActuales(imagenesActuales.filter((img) => img !== url));
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setEliminandoImagen(null);
+    }
+  };
+
   const manejarSubmit = async (e) => {
     e.preventDefault();
     setMensaje("");
@@ -142,7 +175,8 @@ export default function EditarProductoPage() {
       await actualizarProducto(token, id, payload);
 
       if (nuevasImagenes.length > 0) {
-        await subirImagenesProducto(token, id, nuevasImagenes);
+        const resultado = await subirImagenesProducto(token, id, nuevasImagenes);
+        setImagenesActuales(resultado.imagenes || imagenesActuales);
       }
 
       setMensaje("Producto actualizado correctamente");
@@ -224,14 +258,19 @@ export default function EditarProductoPage() {
             onChange={manejarCambio}
             className="border border-gray-300 rounded px-3 py-2"
           />
-          <input
+
+          <select
             name="marca"
-            placeholder="Marca"
             value={form.marca}
             onChange={manejarCambio}
             className="border border-gray-300 rounded px-3 py-2"
             required
-          />
+          >
+            {marcas.map((m) => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+
           <textarea
             name="descripcion"
             placeholder="Descripcion"
@@ -381,12 +420,22 @@ export default function EditarProductoPage() {
               <p className="font-semibold mb-2">Imagenes actuales</p>
               <div className="flex gap-2 flex-wrap">
                 {imagenesActuales.map((img) => (
-                  <img
-                    key={img}
-                    src={img}
-                    alt="imagen producto"
-                    className="w-16 h-16 object-cover rounded border border-gray-200"
-                  />
+                  <div key={img} className="relative">
+                    <img
+                      src={img}
+                      alt="imagen producto"
+                      className="w-16 h-16 object-cover rounded border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => manejarEliminarImagen(img)}
+                      disabled={eliminandoImagen === img}
+                      className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center hover:bg-red-700 transition disabled:opacity-50"
+                      title="Eliminar imagen"
+                    >
+                      {eliminandoImagen === img ? "..." : "x"}
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>

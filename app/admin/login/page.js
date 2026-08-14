@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "../../../lib/api";
-import { guardarToken } from "../../../lib/auth";
+import { guardarSesion } from "../../../lib/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -18,7 +18,14 @@ export default function AdminLoginPage() {
     setCargando(true);
     try {
       const data = await login(email, password);
-      guardarToken(data.token);
+
+      if (data.usuario.rol !== "admin") {
+        setError("Esta cuenta no tiene acceso al panel de administrador.");
+        setCargando(false);
+        return;
+      }
+
+      guardarSesion(data.token, data.usuario);
       router.push("/admin");
     } catch (err) {
       setError(err.message);

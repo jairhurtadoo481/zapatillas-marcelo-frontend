@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 export default function ProductoCard({ producto }) {
   const imagen = producto.imagenes && producto.imagenes.length > 0
@@ -10,22 +10,29 @@ export default function ProductoCard({ producto }) {
   return (
     <Link
       href={`/producto/${producto._id}`}
-      className="group border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition"
+      className="group block"
     >
-      <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+      <div className="aspect-square bg-gray-100 overflow-hidden relative">
         {imagen ? (
           <img
             src={imagen}
             alt={producto.nombre}
-            className="w-full h-full object-cover group-hover:scale-105 transition"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <span className="text-gray-400 text-sm">Sin imagen</span>
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-gray-400 text-sm">Sin imagen</span>
+          </div>
+        )}
+        {tieneOferta && (
+          <span className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 uppercase tracking-wide">
+            Oferta
+          </span>
         )}
       </div>
-      <div className="p-3">
-        <p className="text-xs text-gray-500 uppercase">{producto.marca}</p>
-        <h3 className="font-semibold text-sm truncate">{producto.nombre}</h3>
+      <div className="pt-3">
+        <p className="text-xs text-gray-500 uppercase tracking-wide">{producto.marca}</p>
+        <h3 className="font-semibold text-sm truncate mt-0.5">{producto.nombre}</h3>
         <div className="mt-1 flex items-center gap-2">
           {tieneOferta ? (
             <>

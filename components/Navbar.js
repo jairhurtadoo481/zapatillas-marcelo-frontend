@@ -21,7 +21,7 @@ export default function Navbar() {
   const cerrarMenu = () => setMenuAbierto(false);
 
   return (
-    <header className="bg-black text-white sticky top-0 z-50 shadow-md">
+    <header className="bg-black/70 backdrop-blur-md text-white sticky top-0 z-50 shadow-md">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16 gap-4">
         <Link href="/" className="text-xl font-bold tracking-wide whitespace-nowrap">
           Zapatillas Marcelo
@@ -52,6 +52,9 @@ export default function Navbar() {
           </Link>
           <Link href="/ofertas" className="text-red-400 hover:text-red-300 transition font-semibold">
             Ofertas
+          </Link>
+          <Link href="/seguimiento" className="hover:text-gray-300 transition">
+            Mi pedido
           </Link>
           <CarritoIndicador />
         </nav>
@@ -101,6 +104,9 @@ export default function Navbar() {
               className="text-red-400 hover:text-red-300 transition font-semibold"
             >
               Ofertas
+            </Link>
+            <Link href="/seguimiento" onClick={cerrarMenu} className="hover:text-gray-300 transition">
+              Mi pedido
             </Link>
           </nav>
         </div>

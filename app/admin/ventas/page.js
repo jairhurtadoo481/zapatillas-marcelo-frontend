@@ -2,6 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 import ProtegerAdmin from "../../../components/ProtegerAdmin";
 import {
   obtenerReservas,
@@ -21,8 +34,65 @@ const formatearHora = (fecha) => {
   return d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
 };
 
+const nombreMetodo = { yape: "Yape", plin: "Plin" };
+const nombreSucursal = { sucursal1: "Sucursal 1", sucursal2: "Sucursal 2" };
+const COLORES = ["#000000", "#6b7280", "#a855f7", "#f97316"];
+
+const esHoy = (fecha) => new Date(fecha).toDateString() === new Date().toDateString();
+
+const inicioSemana = () => {
+  const hoy = new Date();
+  const dia = hoy.getDay();
+  const diff = hoy.getDate() - dia + (dia === 0 ? -6 : 1);
+  const lunes = new Date(hoy.setDate(diff));
+  lunes.setHours(0, 0, 0, 0);
+  return lunes;
+};
+
+const inicioMes = () => {
+  const hoy = new Date();
+  return new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+};
+
+const ultimos7Dias = () => {
+  const dias = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    dias.push(d);
+  }
+  return dias;
+};
+
+const descargarCSV = (filas) => {
+  const encabezados = ["Fecha", "Hora", "Origen", "Vendedor", "Metodo", "Codigo", "Producto", "Cantidad", "Descuento", "Subtotal"];
+  const filasCSV = filas.map((f) => [
+    formatearFecha(f.fecha),
+    formatearHora(f.fecha),
+    f.origen,
+    f.vendedor,
+    f.metodo,
+    f.codigo,
+    `"${f.nombre.replace(/"/g, '""')}"`,
+    f.cantidad,
+    f.descuento,
+    f.subtotal,
+  ]);
+
+  const csv = [encabezados.join(","), ...filasCSV.map((fila) => fila.join(","))].join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = `ventas_${new Date().toISOString().slice(0, 10)}.csv`;
+  enlace.click();
+  URL.revokeObjectURL(url);
+};
+
 export default function VentasPage() {
   const [filas, setFilas] = useState([]);
+  const [itemsDetalle, setItemsDetalle] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
@@ -46,20 +116,41 @@ export default function VentasPage() {
       ]);
 
       const filasExpandidas = [];
+      const itemsExpandidos = [];
 
       reservas.forEach((reserva) => {
+        const productosTexto = reserva.items
+          .map((item) => `${item.nombre} (T${item.talla} x${item.cantidad})`)
+          .join(", ");
+        const codigosTexto = reserva.items
+          .map((item) => item.codigo)
+          .filter(Boolean)
+          .map((c) => `#${c}`)
+          .join(", ");
+        const cantidadTotal = reserva.items.reduce((acc, item) => acc + item.cantidad, 0);
+
+        filasExpandidas.push({
+          origen: "Compra web",
+          metodo: nombreMetodo[reserva.metodoPago] || "-",
+          vendedor: reserva.cliente.nombre + " (cliente)",
+          fecha: reserva.updatedAt,
+          codigo: codigosTexto || "-",
+          nombre: productosTexto,
+          cantidad: cantidadTotal,
+          descuento: 0,
+          subtotal: reserva.total,
+          cliente: reserva.cliente.nombre,
+        });
+
         reserva.items.forEach((item) => {
-          filasExpandidas.push({
-            origen: "Reserva web",
-            fecha: reserva.updatedAt,
-            codigo: item.codigo,
+          itemsExpandidos.push({
+            origen: "Compra web",
             nombre: item.nombre,
-            talla: item.talla,
             cantidad: item.cantidad,
-            precioUnitario: item.precioUnitario,
-            descuento: 0,
             subtotal: item.precioUnitario * item.cantidad,
-            cliente: reserva.cliente.nombre,
+            sucursal: item.sucursal || "sucursal1",
+            vendedor: null,
+            fecha: reserva.updatedAt,
           });
         });
       });
@@ -67,20 +158,31 @@ export default function VentasPage() {
       ventas.forEach((venta) => {
         filasExpandidas.push({
           origen: "Tienda",
+          metodo: "-",
+          vendedor: venta.vendedorNombre || "-",
           fecha: venta.createdAt,
-          codigo: venta.codigo,
-          nombre: venta.nombre,
-          talla: venta.talla,
+          codigo: venta.codigo ? `#${venta.codigo}` : "-",
+          nombre: `${venta.nombre} (T${venta.talla} x${venta.cantidad})`,
           cantidad: venta.cantidad,
-          precioUnitario: venta.precioUnitario,
           descuento: venta.descuento || 0,
           subtotal: venta.precioUnitario * venta.cantidad - (venta.descuento || 0),
           cliente: "-",
+        });
+
+        itemsExpandidos.push({
+          origen: "Tienda",
+          nombre: venta.nombre,
+          cantidad: venta.cantidad,
+          subtotal: venta.precioUnitario * venta.cantidad - (venta.descuento || 0),
+          sucursal: venta.sucursal || "sucursal1",
+          vendedor: venta.vendedorNombre || "Sin asignar",
+          fecha: venta.createdAt,
         });
       });
 
       filasExpandidas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
       setFilas(filasExpandidas);
+      setItemsDetalle(itemsExpandidos);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -155,6 +257,56 @@ export default function VentasPage() {
     ? productoEncontrado.precio * cantidad - (Number(descuento) || 0)
     : 0;
 
+  const totalHoy = filas.filter((f) => esHoy(f.fecha)).reduce((acc, f) => acc + f.subtotal, 0);
+  const totalSemana = filas
+    .filter((f) => new Date(f.fecha) >= inicioSemana())
+    .reduce((acc, f) => acc + f.subtotal, 0);
+  const totalMes = filas
+    .filter((f) => new Date(f.fecha) >= inicioMes())
+    .reduce((acc, f) => acc + f.subtotal, 0);
+
+  const datosGrafico = ultimos7Dias().map((dia) => {
+    const total = filas
+      .filter((f) => new Date(f.fecha).toDateString() === dia.toDateString())
+      .reduce((acc, f) => acc + f.subtotal, 0);
+    return {
+      dia: dia.toLocaleDateString("es-PE", { weekday: "short", day: "numeric" }),
+      total,
+    };
+  });
+
+  const topProductos = Object.values(
+    itemsDetalle.reduce((acc, item) => {
+      if (!acc[item.nombre]) acc[item.nombre] = { nombre: item.nombre, cantidad: 0, total: 0 };
+      acc[item.nombre].cantidad += item.cantidad;
+      acc[item.nombre].total += item.subtotal;
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b.cantidad - a.cantidad)
+    .slice(0, 5);
+
+  const rankingVendedores = Object.values(
+    itemsDetalle
+      .filter((item) => item.origen === "Tienda")
+      .reduce((acc, item) => {
+        if (!acc[item.vendedor]) acc[item.vendedor] = { vendedor: item.vendedor, cantidad: 0, total: 0 };
+        acc[item.vendedor].cantidad += item.cantidad;
+        acc[item.vendedor].total += item.subtotal;
+        return acc;
+      }, {})
+  ).sort((a, b) => b.total - a.total);
+
+  const datosOrigen = ["Compra web", "Tienda"].map((origen) => ({
+    name: origen,
+    value: itemsDetalle.filter((i) => i.origen === origen).reduce((acc, i) => acc + i.subtotal, 0),
+  }));
+
+  const datosSucursal = ["sucursal1", "sucursal2"].map((suc) => ({
+    name: nombreSucursal[suc],
+    value: itemsDetalle.filter((i) => i.sucursal === suc).reduce((acc, i) => acc + i.subtotal, 0),
+  }));
+
   return (
     <ProtegerAdmin>
       <div className="max-w-5xl mx-auto px-4 py-10">
@@ -162,15 +314,118 @@ export default function VentasPage() {
           <h1 className="text-2xl font-bold">Ventas</h1>
           <div className="flex gap-3">
             <button
+              onClick={() => descargarCSV(filas)}
+              className="text-sm bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+            >
+              Exportar CSV
+            </button>
+            <button
               onClick={() => setModalAbierto(true)}
               className="text-sm bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
             >
               + Agregar venta
             </button>
             <Link href="/admin/reservas" className="text-sm text-blue-600 hover:underline self-center">
-              Volver a reservas
+              Volver a compras
             </Link>
           </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="border border-gray-200 rounded-lg p-4 text-center">
+            <p className="text-xs text-gray-500">Hoy</p>
+            <p className="text-xl font-bold">S/ {totalHoy}</p>
+          </div>
+          <div className="border border-gray-200 rounded-lg p-4 text-center">
+            <p className="text-xs text-gray-500">Esta semana</p>
+            <p className="text-xl font-bold">S/ {totalSemana}</p>
+          </div>
+          <div className="border border-gray-200 rounded-lg p-4 text-center">
+            <p className="text-xs text-gray-500">Este mes</p>
+            <p className="text-xl font-bold">S/ {totalMes}</p>
+          </div>
+        </div>
+
+        <div className="border border-gray-200 rounded-lg p-4 mb-6">
+          <p className="font-semibold mb-3 text-sm">Ventas de los ultimos 7 dias</p>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={datosGrafico}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="dia" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip formatter={(value) => [`S/ ${value}`, "Total"]} />
+              <Bar dataKey="total" fill="#000000" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 mb-6">
+          <div className="border border-gray-200 rounded-lg p-4">
+            <p className="font-semibold mb-3 text-sm">Compra web vs Tienda</p>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie data={datosOrigen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                  {datosOrigen.map((entry, index) => (
+                    <Cell key={index} fill={COLORES[index % COLORES.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `S/ ${value}`} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            <p className="font-semibold mb-3 text-sm">Sucursal 1 vs Sucursal 2</p>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie data={datosSucursal} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                  {datosSucursal.map((entry, index) => (
+                    <Cell key={index} fill={COLORES[index % COLORES.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `S/ ${value}`} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 mb-6">
+          <div className="border border-gray-200 rounded-lg p-4">
+            <p className="font-semibold mb-3 text-sm">Top 5 productos mas vendidos</p>
+            {topProductos.length === 0 && <p className="text-xs text-gray-400">Sin datos aun.</p>}
+            <div className="flex flex-col gap-2">
+              {topProductos.map((p, i) => (
+                <div key={p.nombre} className="flex items-center justify-between text-sm">
+                  <span>{i + 1}. {p.nombre}</span>
+                  <span className="font-semibold">{p.cantidad} vendidos</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            <p className="font-semibold mb-3 text-sm">Ranking de vendedores (tienda)</p>
+            {rankingVendedores.length === 0 && <p className="text-xs text-gray-400">Sin datos aun.</p>}
+            <div className="flex flex-col gap-2">
+              {rankingVendedores.map((v, i) => (
+                <div key={v.vendedor} className="flex items-center justify-between text-sm">
+                  <span>{i === 0 ? "1st" : i === 1 ? "2nd" : `${i + 1}.`} {v.vendedor}</span>
+                  <span className="font-semibold">S/ {v.total} ({v.cantidad} pares)</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-4 text-xs text-gray-500 mb-4">
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded bg-blue-100 border border-blue-300 inline-block"></span> Compra web
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded bg-green-100 border border-green-300 inline-block"></span> Venta en tienda
+          </span>
         </div>
 
         {cargando && <p className="text-gray-500">Cargando...</p>}
@@ -189,27 +444,31 @@ export default function VentasPage() {
                     <th className="p-2">Fecha</th>
                     <th className="p-2">Hora</th>
                     <th className="p-2">Origen</th>
+                    <th className="p-2">Vendedor</th>
+                    <th className="p-2">Metodo</th>
                     <th className="p-2">Codigo</th>
-                    <th className="p-2">Producto</th>
-                    <th className="p-2">Talla</th>
+                    <th className="p-2">Producto(s)</th>
                     <th className="p-2">Cant.</th>
-                    <th className="p-2">Precio</th>
                     <th className="p-2">Descuento</th>
                     <th className="p-2">Subtotal</th>
-                    <th className="p-2">Cliente</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filas.map((f, i) => (
-                    <tr key={i} className="border-t border-gray-100">
+                    <tr
+                      key={i}
+                      className={`border-t border-gray-100 align-top border-l-4 ${
+                        f.origen === "Compra web" ? "bg-blue-100 border-l-blue-600" : "bg-green-100 border-l-green-600"
+                      }`}
+                    >
                       <td className="p-2">{formatearFecha(f.fecha)}</td>
                       <td className="p-2">{formatearHora(f.fecha)}</td>
                       <td className="p-2">{f.origen}</td>
-                      <td className="p-2">{f.codigo ? `#${f.codigo}` : "-"}</td>
+                      <td className="p-2">{f.vendedor}</td>
+                      <td className="p-2">{f.metodo}</td>
+                      <td className="p-2">{f.codigo}</td>
                       <td className="p-2">{f.nombre}</td>
-                      <td className="p-2">{f.talla}</td>
                       <td className="p-2">{f.cantidad}</td>
-                      <td className="p-2">S/ {f.precioUnitario}</td>
                       <td className="p-2">
                         {f.descuento > 0 ? (
                           <span className="text-red-600">- S/ {f.descuento}</span>
@@ -218,7 +477,6 @@ export default function VentasPage() {
                         )}
                       </td>
                       <td className="p-2 font-semibold">S/ {f.subtotal}</td>
-                      <td className="p-2">{f.cliente}</td>
                     </tr>
                   ))}
                 </tbody>

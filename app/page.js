@@ -1,5 +1,7 @@
-﻿import { obtenerProductos } from "../lib/api";
+import { obtenerProductos } from "../lib/api";
 import ProductoCard from "../components/ProductoCard";
+import HeroInicio from "../components/HeroInicio";
+import MarcasDestacadas from "../components/MarcasDestacadas";
 
 export default async function Home() {
   let destacados = [];
@@ -14,15 +16,11 @@ export default async function Home() {
 
   return (
     <div>
-      <section className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold">Zapatillas Marcelo</h1>
-          <p className="text-gray-300 mt-3">Encuentra tu proximo par ideal</p>
-        </div>
-      </section>
+      <HeroInicio />
+      <MarcasDestacadas />
 
-      <section className="max-w-7xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-6">Destacados</h2>
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="font-display text-3xl mb-6">Destacados</h2>
 
         {error && <p className="text-red-600">{error}</p>}
 

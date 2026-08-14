@@ -1,10 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtegerAdmin from "../../../../components/ProtegerAdmin";
 import { crearProducto, subirImagenesProducto } from "../../../../lib/api";
 import { obtenerToken } from "../../../../lib/auth";
+
+const marcas = [
+  "Joma",
+  "Nike",
+  "Adidas",
+  "Puma",
+  "Lacoste",
+  "Punto Original",
+  "CRforward",
+  "VD-Dariems",
+  "New Athletic",
+  "Michelin",
+  "Underarmour",
+  "Nacionales (Marcelo)",
+];
 
 export default function NuevoProductoPage() {
   const router = useRouter();
@@ -13,7 +28,7 @@ export default function NuevoProductoPage() {
     sucursal: "sucursal1",
     nombre: "",
     modeloBase: "",
-    marca: "",
+    marca: "Nike",
     descripcion: "",
     precio: "",
     categoria: "hombre",
@@ -25,6 +40,30 @@ export default function NuevoProductoPage() {
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
+
+  useEffect(() => {
+    const duplicado = sessionStorage.getItem("productoDuplicar");
+    if (duplicado) {
+      const data = JSON.parse(duplicado);
+      setForm({
+        codigo: data.codigo || "",
+        sucursal: data.sucursal || "sucursal1",
+        nombre: data.nombre || "",
+        modeloBase: data.modeloBase || "",
+        marca: data.marca || "Nike",
+        descripcion: data.descripcion || "",
+        precio: data.precio || "",
+        categoria: data.categoria || "hombre",
+        tipo: data.tipo || "casual",
+        colores: data.colores || "",
+      });
+      if (data.tallas && data.tallas.length > 0) {
+        setTallas(data.tallas.map((t) => ({ talla: t.talla, stock: String(t.stock) })));
+      }
+      setMensaje("Datos copiados de otro producto. Revisa el codigo, imagenes y tallas antes de guardar.");
+      sessionStorage.removeItem("productoDuplicar");
+    }
+  }, []);
 
   const manejarCambio = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -86,7 +125,7 @@ export default function NuevoProductoPage() {
         sucursal: "sucursal1",
         nombre: "",
         modeloBase: "",
-        marca: "",
+        marca: "Nike",
         descripcion: "",
         precio: "",
         categoria: "hombre",
@@ -163,14 +202,18 @@ export default function NuevoProductoPage() {
             </p>
           </div>
 
-          <input
+          <select
             name="marca"
-            placeholder="Marca"
             value={form.marca}
             onChange={manejarCambio}
             className="border border-gray-300 rounded px-3 py-2"
             required
-          />
+          >
+            {marcas.map((m) => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+
           <textarea
             name="descripcion"
             placeholder="Descripcion"
