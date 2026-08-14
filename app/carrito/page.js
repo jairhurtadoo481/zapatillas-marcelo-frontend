@@ -136,18 +136,19 @@ export default function CarritoPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
+    <div className="max-w-3xl mx-auto px-4 py-12 border-t-2 border-black pt-8">
       {paso === "carrito" && (
         <>
-          <h1 className="text-2xl font-bold mb-6">Mi carrito</h1>
+          <h1 className="text-3xl font-bold mb-2">Mi Carrito</h1>
+          <p className="text-gray-500 text-sm mb-8 uppercase tracking-wide">{items.length} producto{items.length !== 1 ? 's' : ''}</p>
 
-          <div className="flex flex-col gap-3 mb-6">
+          <div className="flex flex-col gap-4 mb-8">
             {items.map((item) => (
               <div
                 key={`${item.productoId}-${item.talla}`}
-                className="border border-gray-200 rounded-lg p-3 flex items-center gap-3"
+                className="border-2 border-black rounded-lg p-4 flex items-center gap-4 hover:shadow-lg transition"
               >
-                <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-black">
                   {item.imagen ? (
                     <img src={item.imagen} alt={item.nombre} className="w-full h-full object-cover" />
                   ) : (
@@ -157,46 +158,48 @@ export default function CarritoPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-gray-500 uppercase">{item.marca}</p>
-                  <p className="font-semibold">{item.nombre}</p>
-                  <p className="text-sm text-gray-500">
-                    Talla {item.talla} - Cantidad {item.cantidad}
+                  <p className="text-xs text-gray-500 uppercase font-semibold">{item.marca}</p>
+                  <p className="font-bold text-black">{item.nombre}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Talla <span className="font-semibold">{item.talla}</span> · Cantidad <span className="font-semibold">{item.cantidad}</span>
                   </p>
                   {item.tieneOferta && (
-                    <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded">
+                    <span className="inline-block text-xs bg-red-600 text-white px-3 py-1 rounded-md font-semibold mt-2">
                       En oferta
                     </span>
                   )}
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">S/ {item.precioUnitario * item.cantidad}</p>
+                <div className="text-right flex flex-col items-end gap-2">
+                  <p className="text-xl font-bold text-black">S/ {item.precioUnitario * item.cantidad}</p>
                   <button
                     onClick={() => quitar(item.productoId, item.talla)}
-                    className="text-xs text-red-600 hover:underline"
+                    className="text-xs text-red-600 font-bold hover:text-red-800 hover:underline transition"
                   >
-                    Quitar
+                    ✕ Quitar
                   </button>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-gray-200 pt-4 flex items-center justify-between mb-6">
-            <span className="font-semibold">Total</span>
-            <span className="text-xl font-bold">S/ {total}</span>
+          <div className="border-t-2 border-b-2 border-black py-4 mb-8">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold uppercase tracking-wide">Total</span>
+              <span className="text-3xl font-bold text-black">S/ {total}</span>
+            </div>
           </div>
 
           {algunaOferta && (
-            <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm rounded p-3 mb-6">
-              Uno o mas productos de tu seleccion estan en oferta. Se requiere el pago completo.
+            <div className="bg-yellow-50 border-2 border-yellow-400 text-yellow-800 text-sm rounded-lg p-4 mb-6 font-semibold">
+              ⚠ Uno o más productos están en oferta. Se requiere el pago completo.
             </div>
           )}
 
           <button
             onClick={() => setPaso("datos")}
-            className="w-full bg-black text-white rounded py-3 font-semibold hover:bg-gray-800 transition"
+            className="w-full bg-black text-white rounded-lg py-4 font-bold text-lg hover:bg-gray-900 transition uppercase tracking-wide"
           >
-            Iniciar compra
+            Continuar con la compra
           </button>
         </>
       )}

@@ -30,40 +30,42 @@ export default async function ProductoPage({ params }) {
   const tieneOferta = producto.ofertaActiva === true;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 grid md:grid-cols-2 gap-10">
+    <div className="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-12 border-t-2 border-black pt-8">
       <GaleriaProducto imagenes={producto.imagenes} nombre={producto.nombre} />
 
       <div>
-        <p className="text-sm text-gray-500 uppercase">{producto.marca}</p>
-        <h1 className="text-3xl font-bold mt-1">{producto.nombre}</h1>
+        <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{producto.marca}</p>
+        <h1 className="text-4xl font-bold mt-2 text-black">{producto.nombre}</h1>
 
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-6 flex items-center gap-4 pb-6 border-b-2 border-gray-200">
           {tieneOferta ? (
             <>
-              <span className="text-2xl font-bold text-red-600">S/ {producto.precioOferta}</span>
+              <span className="text-3xl font-bold text-red-600">S/ {producto.precioOferta}</span>
               <span className="text-lg text-gray-400 line-through">S/ {producto.precio}</span>
             </>
           ) : (
-            <span className="text-2xl font-bold">S/ {producto.precio}</span>
+            <span className="text-3xl font-bold text-black">S/ {producto.precio}</span>
           )}
         </div>
 
         {tieneOferta && producto.ofertaFin && (
-          <ContadorOferta ofertaFin={producto.ofertaFin} />
+          <div className="my-4">
+            <ContadorOferta ofertaFin={producto.ofertaFin} />
+          </div>
         )}
 
         {producto.descripcion && (
-          <p className="text-gray-600 mt-4">{producto.descripcion}</p>
+          <p className="text-gray-700 mt-6 leading-relaxed text-sm">{producto.descripcion}</p>
         )}
 
         {producto.colores && producto.colores.length > 0 && (
-          <div className="mt-6">
-            <p className="font-semibold mb-2">Colores</p>
-            <div className="flex gap-2">
+          <div className="mt-8">
+            <p className="font-bold mb-3 text-sm uppercase tracking-wide">Colores</p>
+            <div className="flex gap-2 flex-wrap">
               {producto.colores.map((color) => (
                 <span
                   key={color}
-                  className="border border-gray-300 rounded-full px-3 py-1 text-sm"
+                  className="border-2 border-black rounded-lg px-4 py-2 text-sm font-medium hover:bg-black hover:text-white transition"
                 >
                   {color}
                 </span>
@@ -73,19 +75,19 @@ export default async function ProductoPage({ params }) {
         )}
 
         {producto.tallas && producto.tallas.length > 0 && (
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="font-semibold">Tallas disponibles</p>
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-bold text-sm uppercase tracking-wide">Tallas disponibles</p>
               {producto.categoria === "hombre" && <GuiaTallas />}
             </div>
             <div className="flex flex-wrap gap-2">
               {producto.tallas.map((t) => (
                 <span
                   key={t.talla}
-                  className={`border rounded px-3 py-1 text-sm ${
+                  className={`border-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
                     t.stock > 0
-                      ? "border-gray-300"
-                      : "border-gray-200 text-gray-300 line-through"
+                      ? "border-black hover:bg-black hover:text-white"
+                      : "border-gray-300 text-gray-300 line-through cursor-not-allowed"
                   }`}
                 >
                   {t.talla}
@@ -95,12 +97,18 @@ export default async function ProductoPage({ params }) {
           </div>
         )}
 
-        <SelectorVariantes productoId={producto._id} />
+        <div className="mt-10">
+          <SelectorVariantes productoId={producto._id} />
+        </div>
 
-        <AgregarCarrito producto={producto} />
+        <div className="mt-6">
+          <AgregarCarrito producto={producto} />
+        </div>
 
-        <BotonWhatsapp producto={producto} />
-        <BotonCompartir producto={producto} />
+        <div className="mt-6 flex gap-3">
+          <BotonWhatsapp producto={producto} />
+          <BotonCompartir producto={producto} />
+        </div>
       </div>
     </div>
   );

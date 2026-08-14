@@ -27,14 +27,14 @@ export default function FiltroBar() {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
-      <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center gap-4 mb-8 bg-gray-50 p-4 rounded-lg border-2 border-black">
+      <div className="flex flex-wrap gap-2 flex-1">
         <button
           onClick={() => actualizarFiltro("tipo", "")}
-          className={`text-sm px-3 py-1 rounded-full border ${
+          className={`text-sm px-4 py-2 rounded-lg border-2 font-semibold transition ${
             tipoActivo === ""
-              ? "bg-black text-white border-black"
-              : "border-gray-300 text-gray-600 hover:border-black"
+              ? "bg-black text-white border-black shadow-md"
+              : "border-black text-black hover:bg-black hover:text-white"
           }`}
         >
           Todos
@@ -43,10 +43,10 @@ export default function FiltroBar() {
           <button
             key={tipo}
             onClick={() => actualizarFiltro("tipo", tipo)}
-            className={`text-sm px-3 py-1 rounded-full border capitalize ${
+            className={`text-sm px-4 py-2 rounded-lg border-2 font-semibold capitalize transition ${
               tipoActivo === tipo
-                ? "bg-black text-white border-black"
-                : "border-gray-300 text-gray-600 hover:border-black"
+                ? "bg-black text-white border-black shadow-md"
+                : "border-black text-black hover:bg-black hover:text-white"
             }`}
           >
             {tipo}
@@ -63,15 +63,15 @@ export default function FiltroBar() {
             actualizarFiltro("marca", e.target.value);
           }
         }}
-        className="text-sm border border-gray-300 rounded-full px-3 py-1 w-48"
+        className="text-sm border-2 border-black rounded-lg px-4 py-2 w-48 focus:outline-none focus:shadow-md transition font-medium"
       />
 
       {(tipoActivo || marcaActiva) && (
         <button
           onClick={limpiarFiltros}
-          className="text-sm text-red-600 hover:underline"
+          className="text-sm font-semibold text-red-600 hover:text-red-800 hover:underline transition"
         >
-          Limpiar filtros
+          ✕ Limpiar
         </button>
       )}
     </div>

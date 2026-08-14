@@ -36,7 +36,7 @@ export default function MarcasDestacadas() {
   }, []);
 
   return (
-    <section id="marcas" className="bg-white py-20" ref={contenedorRef}>
+    <section id="marcas" className="bg-white py-20 border-t-2 border-b-2 border-black" ref={contenedorRef}>
       <div className="max-w-6xl mx-auto px-4">
         <p className="text-center text-xs tracking-[0.3em] uppercase text-gray-400 mb-2">
           Trabajamos con
@@ -49,7 +49,7 @@ export default function MarcasDestacadas() {
           {MARCAS.map((marca, i) => (
             <div
               key={marca.nombre}
-              className={`reveal-item ${visible ? "visible" : ""} border border-gray-200 rounded-lg p-6 flex items-center justify-center h-24 grayscale hover:grayscale-0 transition-all duration-300`}
+              className={`reveal-item ${visible ? "visible" : ""} border-2 border-black rounded-lg p-6 flex items-center justify-center h-24 grayscale hover:grayscale-0 transition-all duration-300`}
               style={{ animationDelay: visible ? `${i * 90}ms` : "0ms" }}
             >
               <img

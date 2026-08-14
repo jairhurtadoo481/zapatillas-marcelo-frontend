@@ -50,7 +50,7 @@ export default async function GridCategoria({ categoria, titulo, searchParams, v
             <p className="text-gray-500">Aun no hay productos en esta categoria.</p>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
             {productos.map((producto) => (
               <ProductoCard key={producto._id} producto={producto} />
             ))}

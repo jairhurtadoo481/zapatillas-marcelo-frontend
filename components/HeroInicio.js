@@ -51,13 +51,13 @@ export default function HeroInicio() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="#marcas"
-            className="border border-white px-8 py-3 text-sm tracking-wide uppercase hover:bg-white hover:text-black transition"
+            className="border-2 border-black text-black px-8 py-3 text-sm tracking-wide uppercase font-semibold hover:bg-black hover:text-white transition rounded-lg"
           >
             Ver marcas
           </Link>
           <Link
             href="/ofertas"
-            className="bg-blue-600 px-8 py-3 text-sm tracking-wide uppercase hover:bg-blue-500 transition"
+            className="bg-red-600 border-2 border-red-600 text-white px-8 py-3 text-sm tracking-wide uppercase font-semibold hover:bg-red-700 hover:border-red-700 transition rounded-lg"
           >
             Ver ofertas
           </Link>
