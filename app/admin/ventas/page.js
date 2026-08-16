@@ -21,6 +21,8 @@ import {
   obtenerVentas,
   buscarProductoPorCodigo,
   registrarVentaPorCodigo,
+  eliminarVenta,
+  eliminarReserva,
 } from "../../../lib/api";
 import { obtenerToken } from "../../../lib/auth";
 
@@ -105,6 +107,7 @@ export default function VentasPage() {
   const [buscando, setBuscando] = useState(false);
   const [errorModal, setErrorModal] = useState("");
   const [registrando, setRegistrando] = useState(false);
+  const [eliminandoId, setEliminandoId] = useState(null);
 
   const cargarTodo = async () => {
     setCargando(true);
@@ -130,6 +133,8 @@ export default function VentasPage() {
         const cantidadTotal = reserva.items.reduce((acc, item) => acc + item.cantidad, 0);
 
         filasExpandidas.push({
+          id: reserva._id,
+          tipo: "reserva",
           origen: "Compra web",
           metodo: nombreMetodo[reserva.metodoPago] || "-",
           vendedor: reserva.cliente.nombre + " (cliente)",
@@ -157,6 +162,8 @@ export default function VentasPage() {
 
       ventas.forEach((venta) => {
         filasExpandidas.push({
+          id: venta._id,
+          tipo: "venta",
           origen: "Tienda",
           metodo: "-",
           vendedor: venta.vendedorNombre || "-",
@@ -249,6 +256,38 @@ export default function VentasPage() {
     setCantidad(1);
     setDescuento("");
     setErrorModal("");
+  };
+
+  const manejarEliminarVenta = async (id, nombre) => {
+    const confirmar = window.confirm(`Eliminar esta venta (${nombre})? El stock se va a restaurar automaticamente.`);
+    if (!confirmar) return;
+
+    setEliminandoId(id);
+    try {
+      const token = obtenerToken();
+      await eliminarVenta(token, id);
+      cargarTodo();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setEliminandoId(null);
+    }
+  };
+
+  const manejarEliminarReserva = async (id, nombre) => {
+    const confirmar = window.confirm(`Eliminar esta compra web (${nombre}) por completo?`);
+    if (!confirmar) return;
+
+    setEliminandoId(id);
+    try {
+      const token = obtenerToken();
+      await eliminarReserva(token, id);
+      cargarTodo();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setEliminandoId(null);
+    }
   };
 
   const totalGeneral = filas.reduce((acc, f) => acc + f.subtotal, 0);
@@ -421,10 +460,10 @@ export default function VentasPage() {
 
         <div className="flex gap-4 text-xs text-gray-500 mb-4">
           <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded bg-blue-100 border border-blue-300 inline-block"></span> Compra web
+            <span className="w-3 h-3 rounded bg-blue-200 border border-blue-400 inline-block"></span> Compra web
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded bg-green-100 border border-green-300 inline-block"></span> Venta en tienda
+            <span className="w-3 h-3 rounded bg-green-200 border border-green-400 inline-block"></span> Venta en tienda
           </span>
         </div>
 
@@ -451,6 +490,7 @@ export default function VentasPage() {
                     <th className="p-2">Cant.</th>
                     <th className="p-2">Descuento</th>
                     <th className="p-2">Subtotal</th>
+                    <th className="p-2">Accion</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -471,12 +511,25 @@ export default function VentasPage() {
                       <td className="p-2">{f.cantidad}</td>
                       <td className="p-2">
                         {f.descuento > 0 ? (
-                          <span className="text-red-600">- S/ {f.descuento}</span>
+                          <span className="text-red-700">- S/ {f.descuento}</span>
                         ) : (
                           "-"
                         )}
                       </td>
-                      <td className="p-2 font-semibold">S/ {f.subtotal}</td>
+                      <td className="p-2 font-bold">S/ {f.subtotal}</td>
+                      <td className="p-2">
+                        <button
+                          onClick={() =>
+                            f.tipo === "venta"
+                              ? manejarEliminarVenta(f.id, f.nombre)
+                              : manejarEliminarReserva(f.id, f.nombre)
+                          }
+                          disabled={eliminandoId === f.id}
+                          className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition disabled:opacity-50"
+                        >
+                          {eliminandoId === f.id ? "..." : "Eliminar"}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

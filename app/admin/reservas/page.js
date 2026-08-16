@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ProtegerAdmin from "../../../components/ProtegerAdmin";
-import { obtenerReservas, actualizarEstadoReserva } from "../../../lib/api";
+import { obtenerReservas, actualizarEstadoReserva, eliminarReserva } from "../../../lib/api";
 import { obtenerToken } from "../../../lib/auth";
 
 const UNA_HORA_MS = 60 * 60 * 1000;
@@ -107,6 +107,19 @@ export default function AdminComprasPage() {
       clearInterval(intervaloReloj);
     };
   }, []);
+
+  const manejarEliminar = async (id, numero) => {
+    const confirmar = window.confirm(`Eliminar la compra #${numero} por completo? Esta accion no se puede deshacer.`);
+    if (!confirmar) return;
+
+    try {
+      const token = obtenerToken();
+      await eliminarReserva(token, id);
+      cargar();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   const cambiarEstado = async (id, estado) => {
     try {
@@ -322,6 +335,12 @@ export default function AdminComprasPage() {
                   className="text-xs bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition"
                 >
                   Suspendido
+                </button>
+                <button
+                  onClick={() => manejarEliminar(reserva._id, reserva.numero)}
+                  className="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                >
+                  Eliminar
                 </button>
               </div>
             </div>

@@ -240,7 +240,7 @@ export default function TrabajadorVentasPage() {
           </button>
         </div>
 
-        <div className="border border-gray-200 rounded-lg p-4 mb-6 flex items-center justify-between">
+        <div className="border border-gray-200 rounded-lg p-4 mb-6 flex items-center justify-between bg-white text-gray-900">
           {cargandoTurno ? (
             <p className="text-sm text-gray-500">Verificando turno...</p>
           ) : turno ? (
