@@ -146,7 +146,10 @@ export default function CarritoPage() {
       <div className="max-w-2xl mx-auto px-4 py-10">
         {paso === "carrito" && (
           <>
-            <h1 className="text-2xl font-bold mb-6 text-gray-900">Mi carrito</h1>
+            <h1 className="text-2xl font-bold mb-2 text-gray-900">Mi carrito</h1>
+            <p className="text-sm text-gray-500 mb-6">
+              Revisa los productos que agregaste. Cuando estes listo, presiona "Iniciar compra" para continuar con tus datos y el pago.
+            </p>
 
             <div className="flex flex-col gap-3 mb-6">
               {items.map((item) => (
@@ -210,7 +213,11 @@ export default function CarritoPage() {
 
         {paso === "datos" && (
           <form onSubmit={irAPago} className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold mb-2 text-gray-900">Completa tus datos</h2>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 1 de 4</p>
+            <h2 className="text-xl font-bold text-gray-900">Completa tus datos</h2>
+            <p className="text-sm text-gray-500 -mt-2">
+              Ingresa tu nombre, celular y ciudad para que podamos coordinar la entrega o recojo de tu pedido. Si quieres que te lo llevemos a domicilio, marca la casilla y agrega tu direccion.
+            </p>
 
             <input
               name="nombre"
@@ -271,7 +278,11 @@ export default function CarritoPage() {
 
         {paso === "pago" && (
           <div>
-            <h2 className="text-xl font-bold mb-4 text-gray-900">Metodo de pago</h2>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 2 de 4</p>
+            <h2 className="text-xl font-bold mb-2 text-gray-900">Metodo de pago</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Elige con que app vas a pagar. En el siguiente paso te mostraremos el codigo QR correspondiente para que hagas el pago.
+            </p>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <button
@@ -307,9 +318,13 @@ export default function CarritoPage() {
 
         {paso === "qr" && (
           <div className="text-center">
-            <h2 className="text-xl font-bold mb-4 text-gray-900">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 3 de 4</p>
+            <h2 className="text-xl font-bold mb-2 text-gray-900">
               Escanea el QR de {metodoPago === "yape" ? "Yape" : "Plin"}
             </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Abre tu app de {metodoPago === "yape" ? "Yape" : "Plin"}, escanea este codigo y paga exactamente el monto indicado abajo. Cuando termines, toma una captura de pantalla del comprobante y presiona el boton.
+            </p>
 
             <div className="flex justify-center mb-4">
               {metodoPago === "yape" && config.qrYape && (
@@ -336,7 +351,11 @@ export default function CarritoPage() {
 
         {paso === "comprobante" && (
           <div>
-            <h2 className="text-xl font-bold mb-4 text-gray-900">Sube tu comprobante de pago</h2>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 4 de 4</p>
+            <h2 className="text-xl font-bold mb-2 text-gray-900">Sube tu comprobante de pago</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Selecciona la captura de pantalla o foto del comprobante de tu pago y presiona "Finalizar compra". Nuestro personal verificara el pago y se comunicara contigo en breve.
+            </p>
 
             <input
               type="file"
