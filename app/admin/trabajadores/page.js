@@ -15,6 +15,8 @@ import { obtenerToken } from "../../../lib/auth";
 
 const esHoy = (fecha) => new Date(fecha).toDateString() === new Date().toDateString();
 
+const claseInput = "border border-gray-300 rounded px-3 py-2 bg-white text-gray-900 placeholder-gray-400";
+
 export default function TrabajadoresPage() {
   const [trabajadores, setTrabajadores] = useState([]);
   const [estadisticas, setEstadisticas] = useState({});
@@ -137,177 +139,179 @@ export default function TrabajadoresPage() {
 
   return (
     <ProtegerAdmin>
-      <div className="max-w-2xl mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold mb-6">Trabajadores</h1>
+      <div className="bg-white min-h-screen">
+        <div className="max-w-2xl mx-auto px-4 py-10">
+          <h1 className="text-2xl font-bold mb-6 text-gray-900">Trabajadores</h1>
 
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="border border-gray-200 rounded-lg p-4 text-center">
-            <p className="text-xs text-gray-500">Cuentas</p>
-            <p className="text-xl font-bold">{trabajadores.length}</p>
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="border border-gray-200 rounded-lg p-4 text-center bg-white">
+              <p className="text-xs text-gray-500">Cuentas</p>
+              <p className="text-xl font-bold text-gray-900">{trabajadores.length}</p>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4 text-center bg-white">
+              <p className="text-xs text-gray-500">Trabajando ahora</p>
+              <p className="text-xl font-bold text-green-600">{trabajandoAhora}</p>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4 text-center bg-white">
+              <p className="text-xs text-gray-500">Vendido hoy (todos)</p>
+              <p className="text-xl font-bold text-gray-900">S/ {totalVendidoHoy}</p>
+            </div>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4 text-center">
-            <p className="text-xs text-gray-500">Trabajando ahora</p>
-            <p className="text-xl font-bold text-green-600">{trabajandoAhora}</p>
-          </div>
-          <div className="border border-gray-200 rounded-lg p-4 text-center">
-            <p className="text-xs text-gray-500">Vendido hoy (todos)</p>
-            <p className="text-xl font-bold">S/ {totalVendidoHoy}</p>
-          </div>
-        </div>
 
-        <div className="border border-gray-200 rounded-lg p-4 mb-6">
-          <h2 className="font-semibold mb-3">Agregar trabajador</h2>
-          <form onSubmit={manejarCrear} className="flex flex-col gap-3">
-            <input
-              placeholder="Nombre completo"
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-              className="border border-gray-300 rounded px-3 py-2"
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="border border-gray-300 rounded px-3 py-2"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Contrasenia"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="border border-gray-300 rounded px-3 py-2"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Confirmar contrasenia"
-              value={form.confirmar}
-              onChange={(e) => setForm({ ...form, confirmar: e.target.value })}
-              className="border border-gray-300 rounded px-3 py-2"
-              required
-            />
-            {error && <p className="text-red-600 text-sm">{error}</p>}
-            <button
-              type="submit"
-              disabled={creando}
-              className="bg-black text-white rounded py-2 font-semibold hover:bg-gray-800 transition disabled:opacity-50"
-            >
-              {creando ? "Creando..." : "Crear cuenta"}
-            </button>
-          </form>
-        </div>
-
-        <h2 className="font-semibold mb-3">Cuentas existentes</h2>
-
-        {cargando && <p className="text-gray-500">Cargando...</p>}
-
-        {!cargando && trabajadores.length === 0 && (
-          <p className="text-gray-500">No hay trabajadores registrados todavia.</p>
-        )}
-
-        <div className="flex flex-col gap-3">
-          {trabajadores.map((t) => {
-            const stats = estadisticas[t._id] || { turnoAbierto: false, ventasHoy: 0, cantidadHoy: 0 };
-            const suspendido = t.activo === false;
-            return (
-              <div
-                key={t._id}
-                className={`border rounded-lg p-4 ${suspendido ? "border-red-300 bg-red-50" : "border-gray-200"}`}
+          <div className="border border-gray-200 rounded-lg p-4 mb-6 bg-white">
+            <h2 className="font-semibold mb-3 text-gray-900">Agregar trabajador</h2>
+            <form onSubmit={manejarCrear} className="flex flex-col gap-3">
+              <input
+                placeholder="Nombre completo"
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                className={claseInput}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className={claseInput}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Contrasenia"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className={claseInput}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Confirmar contrasenia"
+                value={form.confirmar}
+                onChange={(e) => setForm({ ...form, confirmar: e.target.value })}
+                className={claseInput}
+                required
+              />
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <button
+                type="submit"
+                disabled={creando}
+                className="bg-black text-white rounded py-2 font-semibold hover:bg-gray-800 transition disabled:opacity-50"
               >
-                {editandoId === t._id ? (
-                  <div className="flex flex-col gap-2">
-                    <input
-                      value={formEdicion.nombre}
-                      onChange={(e) => setFormEdicion({ ...formEdicion, nombre: e.target.value })}
-                      className="border border-gray-300 rounded px-3 py-2 text-sm"
-                    />
-                    <input
-                      value={formEdicion.email}
-                      onChange={(e) => setFormEdicion({ ...formEdicion, email: e.target.value })}
-                      className="border border-gray-300 rounded px-3 py-2 text-sm"
-                    />
-                    <input
-                      type="password"
-                      placeholder="Nueva contrasenia (opcional)"
-                      value={formEdicion.password}
-                      onChange={(e) => setFormEdicion({ ...formEdicion, password: e.target.value })}
-                      className="border border-gray-300 rounded px-3 py-2 text-sm"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => guardarEdicion(t._id)}
-                        className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
-                      >
-                        Guardar
-                      </button>
-                      <button
-                        onClick={() => setEditandoId(null)}
-                        className="text-sm text-gray-500 hover:underline"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold">{t.nombre}</p>
-                        {suspendido ? (
-                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded">
-                            Acceso suspendido
-                          </span>
-                        ) : stats.turnoAbierto ? (
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded flex items-center gap-1">
-                            <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
-                            Trabajando ahora
-                          </span>
-                        ) : (
-                          <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">
-                            Sin turno activo
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500">{t.email}</p>
-                      <p className="text-sm text-gray-700 mt-1">
-                        Hoy: <span className="font-semibold">S/ {stats.ventasHoy}</span> ({stats.cantidadHoy} ventas)
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <button
-                        onClick={() => manejarCambiarActivo(t)}
-                        disabled={cambiandoEstado === t._id}
-                        className={`text-xs px-3 py-1 rounded font-semibold transition disabled:opacity-50 ${
-                          suspendido
-                            ? "bg-green-600 text-white hover:bg-green-700"
-                            : "bg-orange-500 text-white hover:bg-orange-600"
-                        }`}
-                      >
-                        {cambiandoEstado === t._id ? "..." : suspendido ? "Activar acceso" : "Desactivar acceso"}
-                      </button>
-                      <div className="flex gap-3 text-sm">
-                        <Link href={`/admin/trabajadores/${t._id}`} className="text-purple-600 hover:underline">
-                          Historial
-                        </Link>
-                        <button onClick={() => iniciarEdicion(t)} className="text-blue-600 hover:underline">
-                          Editar
+                {creando ? "Creando..." : "Crear cuenta"}
+              </button>
+            </form>
+          </div>
+
+          <h2 className="font-semibold mb-3 text-gray-900">Cuentas existentes</h2>
+
+          {cargando && <p className="text-gray-500">Cargando...</p>}
+
+          {!cargando && trabajadores.length === 0 && (
+            <p className="text-gray-500">No hay trabajadores registrados todavia.</p>
+          )}
+
+          <div className="flex flex-col gap-3">
+            {trabajadores.map((t) => {
+              const stats = estadisticas[t._id] || { turnoAbierto: false, ventasHoy: 0, cantidadHoy: 0 };
+              const suspendido = t.activo === false;
+              return (
+                <div
+                  key={t._id}
+                  className={`border rounded-lg p-4 ${suspendido ? "border-red-300 bg-red-50" : "border-gray-200 bg-white"}`}
+                >
+                  {editandoId === t._id ? (
+                    <div className="flex flex-col gap-2">
+                      <input
+                        value={formEdicion.nombre}
+                        onChange={(e) => setFormEdicion({ ...formEdicion, nombre: e.target.value })}
+                        className={`${claseInput} text-sm`}
+                      />
+                      <input
+                        value={formEdicion.email}
+                        onChange={(e) => setFormEdicion({ ...formEdicion, email: e.target.value })}
+                        className={`${claseInput} text-sm`}
+                      />
+                      <input
+                        type="password"
+                        placeholder="Nueva contrasenia (opcional)"
+                        value={formEdicion.password}
+                        onChange={(e) => setFormEdicion({ ...formEdicion, password: e.target.value })}
+                        className={`${claseInput} text-sm`}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => guardarEdicion(t._id)}
+                          className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                        >
+                          Guardar
                         </button>
                         <button
-                          onClick={() => manejarEliminar(t._id, t.nombre)}
-                          className="text-red-600 hover:underline"
+                          onClick={() => setEditandoId(null)}
+                          className="text-sm text-gray-500 hover:underline"
                         >
-                          Eliminar
+                          Cancelar
                         </button>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold text-gray-900">{t.nombre}</p>
+                          {suspendido ? (
+                            <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded">
+                              Acceso suspendido
+                            </span>
+                          ) : stats.turnoAbierto ? (
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded flex items-center gap-1">
+                              <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
+                              Trabajando ahora
+                            </span>
+                          ) : (
+                            <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">
+                              Sin turno activo
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500">{t.email}</p>
+                        <p className="text-sm text-gray-700 mt-1">
+                          Hoy: <span className="font-semibold text-gray-900">S/ {stats.ventasHoy}</span> ({stats.cantidadHoy} ventas)
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <button
+                          onClick={() => manejarCambiarActivo(t)}
+                          disabled={cambiandoEstado === t._id}
+                          className={`text-xs px-3 py-1 rounded font-semibold transition disabled:opacity-50 ${
+                            suspendido
+                              ? "bg-green-600 text-white hover:bg-green-700"
+                              : "bg-orange-500 text-white hover:bg-orange-600"
+                          }`}
+                        >
+                          {cambiandoEstado === t._id ? "..." : suspendido ? "Activar acceso" : "Desactivar acceso"}
+                        </button>
+                        <div className="flex gap-3 text-sm">
+                          <Link href={`/admin/trabajadores/${t._id}`} className="text-purple-600 hover:underline">
+                            Historial
+                          </Link>
+                          <button onClick={() => iniciarEdicion(t)} className="text-blue-600 hover:underline">
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => manejarEliminar(t._id, t.nombre)}
+                            className="text-red-600 hover:underline"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </ProtegerAdmin>

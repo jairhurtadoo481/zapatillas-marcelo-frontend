@@ -348,7 +348,8 @@ export default function VentasPage() {
 
   return (
     <ProtegerAdmin>
-      <div className="max-w-5xl mx-auto px-4 py-10">
+      <div className="bg-white min-h-screen">
+      <div className="max-w-5xl mx-auto px-4 py-10 text-gray-900">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Ventas</h1>
           <div className="flex gap-3">
@@ -371,21 +372,21 @@ export default function VentasPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="border border-gray-200 rounded-lg p-4 text-center">
+          <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900 text-center">
             <p className="text-xs text-gray-500">Hoy</p>
             <p className="text-xl font-bold">S/ {totalHoy}</p>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4 text-center">
+          <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900 text-center">
             <p className="text-xs text-gray-500">Esta semana</p>
             <p className="text-xl font-bold">S/ {totalSemana}</p>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4 text-center">
+          <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900 text-center">
             <p className="text-xs text-gray-500">Este mes</p>
             <p className="text-xl font-bold">S/ {totalMes}</p>
           </div>
         </div>
 
-        <div className="border border-gray-200 rounded-lg p-4 mb-6">
+        <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900 mb-6">
           <p className="font-semibold mb-3 text-sm">Ventas de los ultimos 7 dias</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={datosGrafico}>
@@ -399,7 +400,7 @@ export default function VentasPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 mb-6">
-          <div className="border border-gray-200 rounded-lg p-4">
+          <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900">
             <p className="font-semibold mb-3 text-sm">Compra web vs Tienda</p>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
@@ -414,7 +415,7 @@ export default function VentasPage() {
             </ResponsiveContainer>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-4">
+          <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900">
             <p className="font-semibold mb-3 text-sm">Sucursal 1 vs Sucursal 2</p>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
@@ -431,7 +432,7 @@ export default function VentasPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 mb-6">
-          <div className="border border-gray-200 rounded-lg p-4">
+          <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900">
             <p className="font-semibold mb-3 text-sm">Top 5 productos mas vendidos</p>
             {topProductos.length === 0 && <p className="text-xs text-gray-400">Sin datos aun.</p>}
             <div className="flex flex-col gap-2">
@@ -444,7 +445,7 @@ export default function VentasPage() {
             </div>
           </div>
 
-          <div className="border border-gray-200 rounded-lg p-4">
+          <div className="border border-gray-200 rounded-lg p-4 bg-white text-gray-900">
             <p className="font-semibold mb-3 text-sm">Ranking de vendedores (tienda)</p>
             {rankingVendedores.length === 0 && <p className="text-xs text-gray-400">Sin datos aun.</p>}
             <div className="flex flex-col gap-2">
@@ -541,6 +542,7 @@ export default function VentasPage() {
             </div>
           </>
         )}
+      </div>
       </div>
 
       {modalAbierto && (

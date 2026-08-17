@@ -3,7 +3,7 @@ import ProductoCard from "./ProductoCard";
 import FiltroBar from "./FiltroBar";
 
 export default async function GridCategoria({ categoria, titulo, searchParams, video }) {
-  const params = { categoria, limit: 24 };
+  const params = { categoria, limit: 1000 };
   if (searchParams?.tipo) params.tipo = searchParams.tipo;
   if (searchParams?.marca) params.marca = searchParams.marca;
 
