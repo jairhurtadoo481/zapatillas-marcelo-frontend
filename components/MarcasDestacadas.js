@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 const MARCAS = [
   { nombre: "Nike", archivo: "/nike.png" },
@@ -36,20 +37,21 @@ export default function MarcasDestacadas() {
   }, []);
 
   return (
-    <section id="marcas" className="bg-black/40 backdrop-blur-md py-20 border-t border-b border-white/20" ref={contenedorRef}>
+    <section id="marcas" className="bg-white py-20" ref={contenedorRef}>
       <div className="max-w-6xl mx-auto px-4">
         <p className="text-center text-xs tracking-[0.3em] uppercase text-gray-400 mb-2">
           Trabajamos con
         </p>
-        <h2 className="font-display text-3xl md:text-4xl text-center mb-12 text-white">
+        <h2 className="font-display text-3xl md:text-4xl text-center mb-12 text-gray-900">
           Marcas originales
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {MARCAS.map((marca, i) => (
-            <div
+            <Link
               key={marca.nombre}
-              className={`reveal-item ${visible ? "visible" : ""} border-2 border-white rounded-lg p-6 flex items-center justify-center h-24 grayscale hover:grayscale-0 transition-all duration-300`}
+              href={`/buscar?q=${encodeURIComponent(marca.nombre)}`}
+              className={`reveal-item ${visible ? "visible" : ""} border border-gray-200 rounded-lg p-6 flex items-center justify-center h-24 grayscale hover:grayscale-0 transition-all duration-300 bg-white cursor-pointer hover:shadow-md`}
               style={{ animationDelay: visible ? `${i * 90}ms` : "0ms" }}
             >
               <img
@@ -57,7 +59,7 @@ export default function MarcasDestacadas() {
                 alt={marca.nombre}
                 className="max-h-12 max-w-full object-contain"
               />
-            </div>
+            </Link>
           ))}
         </div>
       </div>

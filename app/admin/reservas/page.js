@@ -32,38 +32,6 @@ const filtros = [
   { valor: "suspendido", etiqueta: "Suspendido" },
 ];
 
-const reproducirSonido = () => {
-  try {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.5);
-
-    setTimeout(() => {
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.type = "sine";
-      osc2.frequency.setValueAtTime(1100, ctx.currentTime);
-      gain2.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-      osc2.start();
-      osc2.stop(ctx.currentTime + 0.5);
-    }, 200);
-  } catch (e) {
-    // si el navegador bloquea audio automatico, lo ignoramos
-  }
-};
-
 export default function AdminComprasPage() {
   const [reservas, setReservas] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -72,8 +40,36 @@ export default function AdminComprasPage() {
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [filtroSucursal, setFiltroSucursal] = useState("todas");
   const [avisoNueva, setAvisoNueva] = useState(null);
+  const [pausado, setPausado] = useState(false);
 
   const idsConocidos = useRef(null);
+  const audioRef = useRef(null);
+
+  const iniciarTimbre = () => {
+    if (!audioRef.current) return;
+    audioRef.current.loop = true;
+    audioRef.current.currentTime = 0;
+    audioRef.current.play().catch(() => {});
+    setPausado(false);
+  };
+
+  const detenerTimbre = () => {
+    if (!audioRef.current) return;
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    setPausado(false);
+  };
+
+  const alternarPausa = () => {
+    if (!audioRef.current) return;
+    if (audioRef.current.paused) {
+      audioRef.current.play().catch(() => {});
+      setPausado(false);
+    } else {
+      audioRef.current.pause();
+      setPausado(true);
+    }
+  };
 
   const cargar = async () => {
     try {
@@ -83,9 +79,8 @@ export default function AdminComprasPage() {
       if (idsConocidos.current !== null) {
         const nuevas = data.filter((r) => !idsConocidos.current.has(r._id));
         if (nuevas.length > 0) {
-          reproducirSonido();
+          iniciarTimbre();
           setAvisoNueva(`Nueva compra #${nuevas[0].numero} recibida!`);
-          setTimeout(() => setAvisoNueva(null), 6000);
         }
       }
 
@@ -102,9 +97,11 @@ export default function AdminComprasPage() {
     cargar();
     const intervaloDatos = setInterval(cargar, 15000);
     const intervaloReloj = setInterval(() => forzarRender((n) => n + 1), 10000);
+
     return () => {
       clearInterval(intervaloDatos);
       clearInterval(intervaloReloj);
+      detenerTimbre();
     };
   }, []);
 
@@ -168,9 +165,28 @@ export default function AdminComprasPage() {
 
   return (
     <ProtegerAdmin>
+      <audio ref={audioRef} src="/timbre.mp3" preload="auto" />
+
       {avisoNueva && (
-        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg font-semibold animate-bounce">
-          {avisoNueva}
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-5 py-4 rounded-lg shadow-lg font-semibold flex flex-col gap-2 min-w-[220px]">
+          <span>{avisoNueva}</span>
+          <div className="flex gap-2">
+            <button
+              onClick={alternarPausa}
+              className="text-xs bg-white text-green-700 px-3 py-1.5 rounded font-semibold hover:bg-gray-100 transition flex-1"
+            >
+              {pausado ? "Reanudar" : "Pausar"}
+            </button>
+            <button
+              onClick={() => {
+                detenerTimbre();
+                setAvisoNueva(null);
+              }}
+              className="text-xs bg-black/20 text-white px-3 py-1.5 rounded font-semibold hover:bg-black/30 transition flex-1"
+            >
+              Silenciar
+            </button>
+          </div>
         </div>
       )}
 
