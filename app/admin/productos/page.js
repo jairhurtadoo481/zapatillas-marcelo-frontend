@@ -53,7 +53,7 @@ export default function AdminProductosPage() {
   const cargarProductos = async () => {
     setCargando(true);
     try {
-      const data = await obtenerProductos({ limit: 100 });
+      const data = await obtenerProductos({ limit: 1000 });
       setProductos(data.productos);
     } catch (err) {
       setError(err.message);
