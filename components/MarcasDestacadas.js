@@ -15,6 +15,7 @@ const MARCAS = [
   { nombre: "New Athletic", archivo: "/newathletic2.png" },
   { nombre: "Michelin", archivo: "/michelin2.png" },
   { nombre: "Underarmour", archivo: "/underarmour.png" },
+  { nombre: "Ni Air Running", archivo: "/NIAIRRUNNING.png" },
 ];
 
 export default function MarcasDestacadas() {
