@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import ProtegerAdmin from "../../../components/ProtegerAdmin";
-import { obtenerProductos, eliminarProducto } from "../../../lib/api";
-import { obtenerToken } from "../../../lib/auth";
+import ProtegerAdmin from "../../../../components/ProtegerAdmin";
+import { obtenerProductos, eliminarProducto } from "../../../../lib/api";
+import { obtenerToken } from "../../../../lib/auth";
 
 const nombreSucursal = {
   sucursal1: "Sucursal 1",
