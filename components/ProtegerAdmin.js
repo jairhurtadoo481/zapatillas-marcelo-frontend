@@ -9,7 +9,7 @@ export default function ProtegerAdmin({ children }) {
   const [verificando, setVerificando] = useState(true);
 
   useEffect(() => {
-    const token = obtenerToken();
+    const token = obtenerToken(); console.log("[ProtegerAdmin] token:", token); console.log("[ProtegerAdmin] token:", token);
     if (!token) {
       router.push("/admin/login");
     } else {
