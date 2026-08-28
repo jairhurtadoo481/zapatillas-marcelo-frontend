@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata = {
   title: "Zapatillas Marcelo",
   description: "Tienda de zapatillas Zapatillas Marcelo",
+  verification: {
+    google: "5QJLTvzwUwKr-oZ9vk5653HDgSRTukKxxvpsI2W-x_o",
+  },
 };
 
 export default function RootLayout({ children }) {
