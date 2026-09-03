@@ -28,6 +28,8 @@ const marcas = [
   "Ni Air Running",
 ];
 
+const MARCA_CON_REPLICA = "Nacionales (Marcelo)";
+
 const aInputDatetime = (fecha) => {
   if (!fecha) return "";
   const d = new Date(fecha);
@@ -107,6 +109,14 @@ export default function EditarProductoPage() {
 
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
+    if (name === "marca") {
+      setForm((prev) => ({
+        ...prev,
+        marca: value,
+        calidad: value === MARCA_CON_REPLICA ? prev.calidad : "Original",
+      }));
+      return;
+    }
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
@@ -159,7 +169,7 @@ export default function EditarProductoPage() {
         nombre: form.nombre,
         modeloBase: form.modeloBase.trim(),
         marca: form.marca,
-        calidad: form.calidad,
+        calidad: form.marca === MARCA_CON_REPLICA ? form.calidad : "Original",
         descripcion: form.descripcion,
         precio: Number(form.precio),
         categoria: form.categoria,
@@ -281,13 +291,19 @@ export default function EditarProductoPage() {
                 name="calidad"
                 value={form.calidad}
                 onChange={manejarCambio}
-                className="border border-gray-300 rounded px-3 py-2 flex-1 bg-white text-gray-900"
+                disabled={form.marca !== MARCA_CON_REPLICA}
+                className={`border border-gray-300 rounded px-3 py-2 flex-1 bg-white text-gray-900 ${form.marca !== MARCA_CON_REPLICA ? "opacity-50 cursor-not-allowed" : ""}`}
                 required
               >
                 <option value="Original">Original</option>
                 <option value="Replica">Replica</option>
               </select>
             </div>
+            {form.marca !== MARCA_CON_REPLICA && (
+              <p className="text-xs text-gray-400 -mt-2">
+                Solo los productos de "Nacionales (Marcelo)" pueden marcarse como Replica.
+              </p>
+            )}
 
             <textarea
               name="descripcion"

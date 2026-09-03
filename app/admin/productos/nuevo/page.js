@@ -22,6 +22,8 @@ const marcas = [
   "Ni Air Running",
 ];
 
+const MARCA_CON_REPLICA = "Nacionales (Marcelo)";
+
 const claseInput = "border border-gray-300 rounded px-3 py-2 bg-white text-gray-900 placeholder-gray-400";
 
 export default function NuevoProductoPage() {
@@ -55,7 +57,7 @@ export default function NuevoProductoPage() {
         nombre: data.nombre || "",
         modeloBase: data.modeloBase || "",
         marca: data.marca || "Nike",
-        calidad: data.calidad || "Original",
+        calidad: data.marca === MARCA_CON_REPLICA ? (data.calidad || "Original") : "Original",
         descripcion: data.descripcion || "",
         precio: data.precio || "",
         categoria: data.categoria || "hombre",
@@ -71,7 +73,16 @@ export default function NuevoProductoPage() {
   }, []);
 
   const manejarCambio = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "marca") {
+      setForm({
+        ...form,
+        marca: value,
+        calidad: value === MARCA_CON_REPLICA ? form.calidad : "Original",
+      });
+      return;
+    }
+    setForm({ ...form, [name]: value });
   };
 
   const manejarCambioTalla = (index, campo, valor) => {
@@ -107,7 +118,7 @@ export default function NuevoProductoPage() {
         nombre: form.nombre,
         modeloBase: form.modeloBase.trim(),
         marca: form.marca,
-        calidad: form.calidad,
+        calidad: form.marca === MARCA_CON_REPLICA ? form.calidad : "Original",
         descripcion: form.descripcion,
         precio: Number(form.precio),
         categoria: form.categoria,
@@ -227,13 +238,19 @@ export default function NuevoProductoPage() {
                 name="calidad"
                 value={form.calidad}
                 onChange={manejarCambio}
-                className={`${claseInput} flex-1`}
+                disabled={form.marca !== MARCA_CON_REPLICA}
+                className={`${claseInput} flex-1 ${form.marca !== MARCA_CON_REPLICA ? "opacity-50 cursor-not-allowed" : ""}`}
                 required
               >
                 <option value="Original">Original</option>
                 <option value="Replica">Replica</option>
               </select>
             </div>
+            {form.marca !== MARCA_CON_REPLICA && (
+              <p className="text-xs text-gray-400 -mt-2">
+                Solo los productos de "Nacionales (Marcelo)" pueden marcarse como Replica.
+              </p>
+            )}
 
             <textarea
               name="descripcion"

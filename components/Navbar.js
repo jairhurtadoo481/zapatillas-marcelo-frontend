@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import CarritoIndicador from "./CarritoIndicador";
@@ -23,8 +24,9 @@ export default function Navbar() {
   return (
     <header className="bg-black/40 backdrop-blur-md border-b border-white/20 text-black sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16 gap-4">
-        <Link href="/" className="text-2xl font-bold tracking-wider text-white hover:text-gray-300 transition">
-          Zapatillas Marcelo
+        <Link href="/" className="flex items-center gap-2 text-2xl font-bold tracking-wider text-white hover:text-gray-300 transition">
+          <Image src="/marcelo.png" alt="La Casa de Marcelo" width={36} height={36} className="rounded" />
+          LA CASA DE MARCELO
         </Link>
 
         <form onSubmit={manejarBuscar} className="hidden md:block flex-1 max-w-md">
@@ -48,7 +50,7 @@ export default function Navbar() {
             Mujer
           </Link>
           <Link href="/ninios" className="text-white hover:text-red-400 hover:border-b-2 hover:border-red-400 pb-0.5 transition">
-            {"Niños"}
+            {"Ni\u00f1os"}
           </Link>
           <Link href="/ofertas" className="text-red-400 font-bold hover:text-red-300 hover:border-b-2 hover:border-red-400 pb-0.5 transition">
             Ofertas
@@ -96,7 +98,7 @@ export default function Navbar() {
               Mujer
             </Link>
             <Link href="/ninios" onClick={cerrarMenu} className="text-white hover:text-red-400 transition">
-              {"Niños"}
+              {"Ni\u00f1os"}
             </Link>
             <Link
               href="/ofertas"
