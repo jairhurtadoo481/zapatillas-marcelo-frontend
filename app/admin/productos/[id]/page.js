@@ -45,6 +45,7 @@ export default function EditarProductoPage() {
     nombre: "",
     modeloBase: "",
     marca: "Nike",
+    calidad: "Original",
     descripcion: "",
     precio: "",
     categoria: "hombre",
@@ -75,6 +76,7 @@ export default function EditarProductoPage() {
         nombre: producto.nombre,
         modeloBase: producto.modeloBase || "",
         marca: producto.marca && marcas.includes(producto.marca) ? producto.marca : "Nike",
+        calidad: producto.calidad || "Original",
         descripcion: producto.descripcion || "",
         precio: producto.precio,
         categoria: producto.categoria,
@@ -157,6 +159,7 @@ export default function EditarProductoPage() {
         nombre: form.nombre,
         modeloBase: form.modeloBase.trim(),
         marca: form.marca,
+        calidad: form.calidad,
         descripcion: form.descripcion,
         precio: Number(form.precio),
         categoria: form.categoria,
@@ -261,17 +264,30 @@ export default function EditarProductoPage() {
               className="border border-gray-300 rounded px-3 py-2 bg-white text-gray-900"
             />
 
-            <select
-              name="marca"
-              value={form.marca}
-              onChange={manejarCambio}
-              className="border border-gray-300 rounded px-3 py-2 bg-white text-gray-900"
-              required
-            >
-              {marcas.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
+            <div className="flex gap-3">
+              <select
+                name="marca"
+                value={form.marca}
+                onChange={manejarCambio}
+                className="border border-gray-300 rounded px-3 py-2 flex-1 bg-white text-gray-900"
+                required
+              >
+                {marcas.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+
+              <select
+                name="calidad"
+                value={form.calidad}
+                onChange={manejarCambio}
+                className="border border-gray-300 rounded px-3 py-2 flex-1 bg-white text-gray-900"
+                required
+              >
+                <option value="Original">Original</option>
+                <option value="Replica">Replica</option>
+              </select>
+            </div>
 
             <textarea
               name="descripcion"

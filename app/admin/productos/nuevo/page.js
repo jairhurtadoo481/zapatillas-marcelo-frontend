@@ -32,6 +32,7 @@ export default function NuevoProductoPage() {
     nombre: "",
     modeloBase: "",
     marca: "Nike",
+    calidad: "Original",
     descripcion: "",
     precio: "",
     categoria: "hombre",
@@ -54,6 +55,7 @@ export default function NuevoProductoPage() {
         nombre: data.nombre || "",
         modeloBase: data.modeloBase || "",
         marca: data.marca || "Nike",
+        calidad: data.calidad || "Original",
         descripcion: data.descripcion || "",
         precio: data.precio || "",
         categoria: data.categoria || "hombre",
@@ -105,6 +107,7 @@ export default function NuevoProductoPage() {
         nombre: form.nombre,
         modeloBase: form.modeloBase.trim(),
         marca: form.marca,
+        calidad: form.calidad,
         descripcion: form.descripcion,
         precio: Number(form.precio),
         categoria: form.categoria,
@@ -129,6 +132,7 @@ export default function NuevoProductoPage() {
         nombre: "",
         modeloBase: "",
         marca: "Nike",
+        calidad: "Original",
         descripcion: "",
         precio: "",
         categoria: "hombre",
@@ -206,17 +210,30 @@ export default function NuevoProductoPage() {
               </p>
             </div>
 
-            <select
-              name="marca"
-              value={form.marca}
-              onChange={manejarCambio}
-              className={claseInput}
-              required
-            >
-              {marcas.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
+            <div className="flex gap-3">
+              <select
+                name="marca"
+                value={form.marca}
+                onChange={manejarCambio}
+                className={`${claseInput} flex-1`}
+                required
+              >
+                {marcas.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+
+              <select
+                name="calidad"
+                value={form.calidad}
+                onChange={manejarCambio}
+                className={`${claseInput} flex-1`}
+                required
+              >
+                <option value="Original">Original</option>
+                <option value="Replica">Replica</option>
+              </select>
+            </div>
 
             <textarea
               name="descripcion"
