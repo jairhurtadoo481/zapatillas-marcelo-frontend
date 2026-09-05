@@ -12,6 +12,12 @@ import { crearReserva, subirComprobante, obtenerConfiguracion } from "../../lib/
 
 const claseInput = "border border-gray-300 rounded px-3 py-2 bg-white text-gray-900 placeholder-gray-400";
 
+const METODOS_PAGO = [
+  { id: "yape", nombre: "Yape", logo: "/yape.png", colorBorde: "border-purple-600", colorFondo: "bg-purple-50" },
+  { id: "plin", nombre: "Plin", logo: "/plin.png", colorBorde: "border-teal-500", colorFondo: "bg-teal-50" },
+  { id: "bcp", nombre: "BCP", logo: "/bcp.jpg", colorBorde: "border-blue-600", colorFondo: "bg-blue-50" },
+];
+
 export default function CarritoPage() {
   const router = useRouter();
   const [items, setItems] = useState([]);
@@ -26,7 +32,7 @@ export default function CarritoPage() {
   });
 
   const [metodoPago, setMetodoPago] = useState("");
-  const [config, setConfig] = useState({ qrYape: null, qrPlin: null });
+  const [config, setConfig] = useState({ qrYape: null, qrPlin: null, qrBcp: null });
   const [archivoComprobante, setArchivoComprobante] = useState(null);
 
   const [enviando, setEnviando] = useState(false);
@@ -108,23 +114,27 @@ export default function CarritoPage() {
     }
   };
 
+  const fondoOscuro = "min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black";
+
   if (paso === "exito") {
     return (
-      <div className="bg-white min-h-screen">
+      <div className={fondoOscuro}>
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold text-green-600 mb-3">Compra exitosa!</h1>
-          <p className="text-gray-700 mb-2">Tu numero de pedido es #{numeroFinal}</p>
-          <p className="text-gray-700 mb-6">Nuestro personal se comunicara en breve para confirmar tu compra.</p>
-          <div className="flex flex-col gap-3 items-center">
-            <Link href="/seguimiento" className="text-sm text-blue-600 hover:underline">
-              Ver estado de mi pedido
-            </Link>
-            <button
-              onClick={() => router.push("/")}
-              className="bg-black text-white rounded px-6 py-2 font-semibold hover:bg-gray-800 transition"
-            >
-              Volver al inicio
-            </button>
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <h1 className="text-2xl font-bold text-green-600 mb-3">Compra exitosa!</h1>
+            <p className="text-gray-700 mb-2">Tu numero de pedido es #{numeroFinal}</p>
+            <p className="text-gray-700 mb-6">Nuestro personal se comunicara en breve para confirmar tu compra.</p>
+            <div className="flex flex-col gap-3 items-center">
+              <Link href="/seguimiento" className="text-sm text-blue-600 hover:underline">
+                Ver estado de mi pedido
+              </Link>
+              <button
+                onClick={() => router.push("/")}
+                className="bg-black text-white rounded px-6 py-2 font-semibold hover:bg-gray-800 transition"
+              >
+                Volver al inicio
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -133,19 +143,21 @@ export default function CarritoPage() {
 
   if (paso === "carrito" && items.length === 0) {
     return (
-      <div className="bg-white min-h-screen">
+      <div className={fondoOscuro}>
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
-          <p className="text-gray-500">Tu carrito esta vacio.</p>
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <p className="text-gray-500">Tu carrito esta vacio.</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className={fondoOscuro}>
       <div className="max-w-2xl mx-auto px-4 py-10">
         {paso === "carrito" && (
-          <>
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
             <h1 className="text-2xl font-bold mb-2 text-gray-900">Mi carrito</h1>
             <p className="text-sm text-gray-500 mb-6">
               Revisa los productos que agregaste. Cuando estes listo, presiona "Iniciar compra" para continuar con tus datos y el pago.
@@ -208,108 +220,119 @@ export default function CarritoPage() {
             >
               Iniciar compra
             </button>
-          </>
+          </div>
         )}
 
         {paso === "datos" && (
-          <form onSubmit={irAPago} className="flex flex-col gap-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 1 de 4</p>
-            <h2 className="text-xl font-bold text-gray-900">Completa tus datos</h2>
-            <p className="text-sm text-gray-500 -mt-2">
-              Ingresa tu nombre, celular y ciudad para que podamos coordinar la entrega o recojo de tu pedido. Si quieres que te lo llevemos a domicilio, marca la casilla y agrega tu direccion.
-            </p>
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <form onSubmit={irAPago} className="flex flex-col gap-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 1 de 4</p>
+              <h2 className="text-xl font-bold text-gray-900">Completa tus datos</h2>
+              <p className="text-sm text-gray-500 -mt-2">
+                Ingresa tu nombre, celular y ciudad para que podamos coordinar la entrega o recojo de tu pedido. Si quieres que te lo llevemos a domicilio, marca la casilla y agrega tu direccion.
+              </p>
 
-            <input
-              name="nombre"
-              placeholder="Nombre completo"
-              value={form.nombre}
-              onChange={manejarCambioForm}
-              className={claseInput}
-              required
-            />
-            <input
-              name="celular"
-              placeholder="Numero de celular"
-              value={form.celular}
-              onChange={manejarCambioForm}
-              className={claseInput}
-              required
-            />
-
-            <select
-              name="ciudad"
-              value={form.ciudad}
-              onChange={manejarCambioForm}
-              className={claseInput}
-            >
-              <option value="andahuaylas">Andahuaylas</option>
-              <option value="fuera">Fuera de Andahuaylas</option>
-            </select>
-
-            <label className="flex items-center gap-2 text-sm text-gray-900">
               <input
-                type="checkbox"
-                name="entregaDomicilio"
-                checked={form.entregaDomicilio}
-                onChange={manejarCambioForm}
-              />
-              Quiero que me lo entreguen/lleven a mi casa
-            </label>
-
-            {form.entregaDomicilio && (
-              <input
-                name="direccion"
-                placeholder="Direccion completa"
-                value={form.direccion}
+                name="nombre"
+                placeholder="Nombre completo"
+                value={form.nombre}
                 onChange={manejarCambioForm}
                 className={claseInput}
                 required
               />
-            )}
+              <input
+                name="celular"
+                placeholder="Numero de celular"
+                value={form.celular}
+                onChange={manejarCambioForm}
+                className={claseInput}
+                required
+              />
 
-            <button
-              type="submit"
-              className="bg-black text-white rounded py-3 font-semibold hover:bg-gray-800 transition"
-            >
-              Siguiente paso
-            </button>
-          </form>
+              <select
+                name="ciudad"
+                value={form.ciudad}
+                onChange={manejarCambioForm}
+                className={claseInput}
+              >
+                <option value="andahuaylas">Andahuaylas</option>
+                <option value="fuera">Fuera de Andahuaylas</option>
+              </select>
+
+              <label className="flex items-center gap-2 text-sm text-gray-900">
+                <input
+                  type="checkbox"
+                  name="entregaDomicilio"
+                  checked={form.entregaDomicilio}
+                  onChange={manejarCambioForm}
+                />
+                Quiero que me lo entreguen/lleven a mi casa
+              </label>
+
+              {form.entregaDomicilio && (
+                <input
+                  name="direccion"
+                  placeholder="Direccion completa"
+                  value={form.direccion}
+                  onChange={manejarCambioForm}
+                  className={claseInput}
+                  required
+                />
+              )}
+
+              <button
+                type="submit"
+                className="bg-black text-white rounded py-3 font-semibold hover:bg-gray-800 transition"
+              >
+                Siguiente paso
+              </button>
+            </form>
+          </div>
         )}
 
         {paso === "pago" && (
-          <div>
+          <div className="rounded-2xl p-6 md:p-10 shadow-xl">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 2 de 4</p>
-            <h2 className="text-xl font-bold mb-2 text-gray-900">Metodo de pago</h2>
-            <p className="text-sm text-gray-500 mb-4">
+            <h2 className="text-2xl font-bold mb-2 text-white">Metodo de pago</h2>
+            <p className="text-sm text-gray-300 mb-6">
               Elige con que app vas a pagar. En el siguiente paso te mostraremos el codigo QR correspondiente para que hagas el pago.
             </p>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <button
-                onClick={() => setMetodoPago("yape")}
-                className={`border-2 rounded-lg p-6 text-center font-bold bg-white ${
-                  metodoPago === "yape" ? "border-purple-600 bg-purple-50" : "border-gray-200"
-                }`}
-                style={{ color: "#7B2FF7" }}
-              >
-                YAPE
-              </button>
-              <button
-                onClick={() => setMetodoPago("plin")}
-                className={`border-2 rounded-lg p-6 text-center font-bold bg-white ${
-                  metodoPago === "plin" ? "border-teal-500 bg-teal-50" : "border-gray-200"
-                }`}
-                style={{ color: "#00C1A2" }}
-              >
-                PLIN
-              </button>
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              {METODOS_PAGO.map((metodo) => {
+                const seleccionado = metodoPago === metodo.id;
+                return (
+                  <button
+                    key={metodo.id}
+                    onClick={() => setMetodoPago(metodo.id)}
+                    className={`relative rounded-xl p-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 border-2 bg-white ${
+                      seleccionado
+                        ? `${metodo.colorBorde} ${metodo.colorFondo} scale-105 shadow-lg`
+                        : "border-transparent hover:border-gray-300 hover:scale-102"
+                    }`}
+                  >
+                    {seleccionado && (
+                      <span className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow">
+                        {"\u2713"}
+                      </span>
+                    )}
+                    <img
+                      src={metodo.logo}
+                      alt={metodo.nombre}
+                      className="w-16 h-16 object-contain"
+                    />
+                    <span className="text-sm font-bold text-gray-800">{metodo.nombre}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+            {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
             <button
               onClick={irAQr}
-              className="w-full bg-black text-white rounded py-3 font-semibold hover:bg-gray-800 transition"
+              disabled={!metodoPago}
+              className="w-full bg-white text-gray-900 rounded-lg py-3 font-bold hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Siguiente paso
             </button>
@@ -317,13 +340,13 @@ export default function CarritoPage() {
         )}
 
         {paso === "qr" && (
-          <div className="text-center">
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 3 de 4</p>
             <h2 className="text-xl font-bold mb-2 text-gray-900">
-              Escanea el QR de {metodoPago === "yape" ? "Yape" : "Plin"}
+              Escanea el QR de {metodoPago === "yape" ? "Yape" : metodoPago === "plin" ? "Plin" : "BCP"}
             </h2>
             <p className="text-sm text-gray-500 mb-4">
-              Abre tu app de {metodoPago === "yape" ? "Yape" : "Plin"}, escanea este codigo y paga exactamente el monto indicado abajo. Cuando termines, toma una captura de pantalla del comprobante y presiona el boton.
+              Abre tu app de {metodoPago === "yape" ? "Yape" : metodoPago === "plin" ? "Plin" : "BCP"}, escanea este codigo y paga exactamente el monto indicado abajo. Cuando termines, toma una captura de pantalla del comprobante y presiona el boton.
             </p>
 
             <div className="flex justify-center mb-4">
@@ -333,7 +356,12 @@ export default function CarritoPage() {
               {metodoPago === "plin" && config.qrPlin && (
                 <img src={config.qrPlin} alt="QR Plin" className="w-56 h-56 object-contain border border-gray-200 rounded" />
               )}
-              {((metodoPago === "yape" && !config.qrYape) || (metodoPago === "plin" && !config.qrPlin)) && (
+              {metodoPago === "bcp" && config.qrBcp && (
+                <img src={config.qrBcp} alt="QR BCP" className="w-56 h-56 object-contain border border-gray-200 rounded" />
+              )}
+              {((metodoPago === "yape" && !config.qrYape) ||
+                (metodoPago === "plin" && !config.qrPlin) ||
+                (metodoPago === "bcp" && !config.qrBcp)) && (
                 <p className="text-gray-500 text-sm">QR no disponible por el momento, contactanos por WhatsApp.</p>
               )}
             </div>
@@ -350,7 +378,7 @@ export default function CarritoPage() {
         )}
 
         {paso === "comprobante" && (
-          <div>
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Paso 4 de 4</p>
             <h2 className="text-xl font-bold mb-2 text-gray-900">Sube tu comprobante de pago</h2>
             <p className="text-sm text-gray-500 mb-4">

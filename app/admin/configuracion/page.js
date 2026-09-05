@@ -4,10 +4,11 @@ import ProtegerAdmin from "../../../components/ProtegerAdmin";
 import { obtenerConfiguracion, subirQr } from "../../../lib/api";
 import { obtenerToken } from "../../../lib/auth";
 export default function ConfiguracionPage() {
-  const [config, setConfig] = useState({ qrYape: null, qrPlin: null });
+  const [config, setConfig] = useState({ qrYape: null, qrPlin: null, qrBcp: null });
   const [cargando, setCargando] = useState(true);
   const [subiendoYape, setSubiendoYape] = useState(false);
   const [subiendoPlin, setSubiendoPlin] = useState(false);
+  const [subiendoBcp, setSubiendoBcp] = useState(false);
   const [error, setError] = useState("");
   const cargar = async () => {
     try {
@@ -52,6 +53,21 @@ export default function ConfiguracionPage() {
       setSubiendoPlin(false);
     }
   };
+  const manejarSubidaBcp = async (e) => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    setSubiendoBcp(true);
+    setError("");
+    try {
+      const token = obtenerToken();
+      const data = await subirQr(token, "bcp", archivo);
+      setConfig(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubiendoBcp(false);
+    }
+  };
   if (cargando) {
     return (
       <div className="bg-white min-h-screen">
@@ -79,7 +95,7 @@ export default function ConfiguracionPage() {
             />
             {subiendoYape && <p className="text-xs text-gray-500 mt-1">Subiendo...</p>}
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
+          <div className="border border-gray-200 rounded-lg p-4 mb-4">
             <p className="font-semibold mb-3 text-gray-900">QR de Plin</p>
             {config.qrPlin && (
               <img src={config.qrPlin} alt="QR Plin" className="w-40 h-40 object-contain mb-3 border border-gray-100 rounded" />
@@ -92,6 +108,20 @@ export default function ConfiguracionPage() {
               className="border border-gray-300 rounded px-3 py-2 w-full text-sm bg-white text-gray-900"
             />
             {subiendoPlin && <p className="text-xs text-gray-500 mt-1">Subiendo...</p>}
+          </div>
+          <div className="border border-gray-200 rounded-lg p-4">
+            <p className="font-semibold mb-3 text-gray-900">QR de BCP</p>
+            {config.qrBcp && (
+              <img src={config.qrBcp} alt="QR BCP" className="w-40 h-40 object-contain mb-3 border border-gray-100 rounded" />
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={manejarSubidaBcp}
+              disabled={subiendoBcp}
+              className="border border-gray-300 rounded px-3 py-2 w-full text-sm bg-white text-gray-900"
+            />
+            {subiendoBcp && <p className="text-xs text-gray-500 mt-1">Subiendo...</p>}
           </div>
         </div>
       </div>
