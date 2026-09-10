@@ -137,6 +137,14 @@ export default function AdminPage() {
             </Link>
 
             <Link
+              href="/admin/precios"
+              className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
+            >
+              <p className="font-semibold text-lg text-gray-900">Precios</p>
+              <p className="text-sm text-gray-500">Editar precio web y precio presencial por marca</p>
+            </Link>
+
+            <Link
               href="/admin/configuracion"
               className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
             >
