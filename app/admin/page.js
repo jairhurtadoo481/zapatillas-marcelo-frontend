@@ -137,6 +137,22 @@ export default function AdminPage() {
             </Link>
 
             <Link
+              href="/admin/inventario-rapido"
+              className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
+            >
+              <p className="font-semibold text-lg text-gray-900">Inventario rapido</p>
+              <p className="text-sm text-gray-500">Escanea cajas para agregar stock o crear productos nuevos</p>
+            </Link>
+
+            <Link
+              href="/admin/mayoristas"
+              className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
+            >
+              <p className="font-semibold text-lg text-gray-900">Mayoristas</p>
+              <p className="text-sm text-gray-500">Crear cuentas y ver reservas al por mayor</p>
+            </Link>
+
+            <Link
               href="/admin/precios"
               className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
             >
@@ -157,3 +173,5 @@ export default function AdminPage() {
     </ProtegerAdmin>
   );
 }
+
+

@@ -116,6 +116,10 @@ export default function Footer() {
               Admin
             </Link>
             <span className="text-gray-600">\u2022</span>
+            <Link href="/mayorista/login" className="text-xs text-gray-500 hover:text-gray-300 transition underline">
+              Mayorista
+            </Link>
+            <span className="text-gray-600">\u2022</span>
             <Link href="/trabajador/login" className="text-xs text-gray-500 hover:text-gray-300 transition underline">
               Trabajador
             </Link>
