@@ -167,6 +167,14 @@ export default function AdminPage() {
               <p className="font-semibold text-lg text-gray-900">Configuracion</p>
               <p className="text-sm text-gray-500">QR de Yape y Plin para pagos</p>
             </Link>
+
+            <Link
+              href="/admin/facturacion"
+              className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
+            >
+              <p className="font-semibold text-lg text-gray-900">Facturacion Electronica</p>
+              <p className="text-sm text-gray-500">Emitir boletas y facturas electronicas vinculadas a SUNAT</p>
+            </Link>
           </div>
         </div>
       </div>
