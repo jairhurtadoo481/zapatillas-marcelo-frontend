@@ -11,7 +11,19 @@ import {
   guardarClienteApi,
   emitirComprobanteApi,
   obtenerComprobantes,
+  emitirNotaCreditoApi,
 } from "../../../lib/api";
+
+const MOTIVOS_NOTA_CREDITO = [
+  ["01", "Anulacion de la operacion"],
+  ["02", "Anulacion por error en el RUC"],
+  ["03", "Correccion por error en la descripcion"],
+  ["04", "Descuento global"],
+  ["05", "Descuento por item"],
+  ["06", "Devolucion total"],
+  ["07", "Devolucion por item"],
+  ["10", "Otros conceptos"],
+];
 
 const CLIENTE_VACIO = {
   tipoDocumento: "DNI",
@@ -857,23 +869,85 @@ function TabEmitir({ config, recargar }) {
   );
 }
 
+function NotaCreditoModal({ comprobante, onCerrar, onEmitida }) {
+  const [motivoCodigo, setMotivoCodigo] = useState("01");
+  const [emitiendo, setEmitiendo] = useState(false);
+  const [error, setError] = useState("");
+
+  const confirmar = async () => {
+    setEmitiendo(true);
+    setError("");
+    try {
+      const token = obtenerToken();
+      const nota = await emitirNotaCreditoApi(token, comprobante._id, motivoCodigo);
+      onEmitida(nota);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setEmitiendo(false);
+    }
+  };
+
+  return (
+    <Modal titulo="Anular con Nota de Credito" onCerrar={onCerrar}>
+      <p className="text-sm text-gray-700">
+        Vas a anular <span className="font-semibold">{comprobante.serie}-{comprobante.correlativo}</span> ({comprobante.cliente.nombre}, S/{" "}
+        {comprobante.total.toFixed(2)}). Esto genera una Nota de Credito real ante SUNAT y no se puede deshacer.
+      </p>
+      <div>
+        <label className="text-xs text-gray-500">Motivo</label>
+        <select
+          value={motivoCodigo}
+          onChange={(e) => setMotivoCodigo(e.target.value)}
+          className="border border-gray-300 rounded px-3 py-2 w-full text-sm text-gray-900"
+        >
+          {MOTIVOS_NOTA_CREDITO.map(([codigo, texto]) => (
+            <option key={codigo} value={codigo}>
+              {texto}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {error && <p className="text-red-600 text-sm">{error}</p>}
+
+      <div className="flex gap-2 pt-2">
+        <button
+          onClick={confirmar}
+          disabled={emitiendo}
+          className="bg-red-700 text-white text-sm font-medium px-4 py-2 rounded flex-1"
+        >
+          {emitiendo ? "Emitiendo..." : "Confirmar anulacion"}
+        </button>
+        <button onClick={onCerrar} className="bg-gray-200 text-gray-800 text-sm px-4 py-2 rounded">
+          Cancelar
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+const TIPO_ETIQUETA = { boleta: "Boleta", factura: "Factura", nota_credito: "Nota de Credito" };
+
 function TabHistorial() {
   const [comprobantes, setComprobantes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+  const [comprobanteParaAnular, setComprobanteParaAnular] = useState(null);
+
+  const cargar = async () => {
+    try {
+      const token = obtenerToken();
+      const data = await obtenerComprobantes(token);
+      setComprobantes(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCargando(false);
+    }
+  };
 
   useEffect(() => {
-    const cargar = async () => {
-      try {
-        const token = obtenerToken();
-        const data = await obtenerComprobantes(token);
-        setComprobantes(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setCargando(false);
-      }
-    };
     cargar();
   }, []);
 
@@ -890,24 +964,52 @@ function TabHistorial() {
 
   return (
     <div className="space-y-2">
+      {comprobanteParaAnular && (
+        <NotaCreditoModal
+          comprobante={comprobanteParaAnular}
+          onCerrar={() => setComprobanteParaAnular(null)}
+          onEmitida={() => {
+            setComprobanteParaAnular(null);
+            cargar();
+          }}
+        />
+      )}
+
       {comprobantes.map((c) => (
-        <div key={c._id} className="border border-gray-200 rounded-lg p-3 flex items-center justify-between text-sm">
-          <div>
-            <p className="font-medium text-gray-900">
-              {c.serie}-{c.correlativo} · {c.cliente.nombre}
-            </p>
-            <p className="text-xs text-gray-500">
-              {new Date(c.createdAt).toLocaleString("es-PE")} · S/ {c.total.toFixed(2)}
-            </p>
+        <div key={c._id} className="border border-gray-200 rounded-lg p-3 text-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-gray-900">
+                {TIPO_ETIQUETA[c.tipo] || c.tipo} {c.serie}-{c.correlativo} · {c.cliente.nombre}
+              </p>
+              <p className="text-xs text-gray-500">
+                {new Date(c.createdAt).toLocaleString("es-PE")} · S/ {c.total.toFixed(2)}
+              </p>
+              {c.tipo === "nota_credito" && c.comprobanteAfectado && (
+                <p className="text-xs text-gray-500">
+                  Anula a {c.comprobanteAfectado.serie}-{c.comprobanteAfectado.correlativo} · {c.motivoDescripcion}
+                </p>
+              )}
+            </div>
+            <div className="text-right">
+              <p className={`font-semibold ${colorEstado[c.estado] || "text-gray-700"}`}>
+                {c.anulado ? "ANULADO" : c.estado.toUpperCase()}
+              </p>
+              {c.pdfUrl && (
+                <a href={c.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-gray-600">
+                  PDF
+                </a>
+              )}
+            </div>
           </div>
-          <div className="text-right">
-            <p className={`font-semibold ${colorEstado[c.estado] || "text-gray-700"}`}>{c.estado.toUpperCase()}</p>
-            {c.pdfUrl && (
-              <a href={c.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-gray-600">
-                PDF
-              </a>
-            )}
-          </div>
+          {c.estado === "aceptado" && c.tipo !== "nota_credito" && !c.anulado && (
+            <button
+              onClick={() => setComprobanteParaAnular(c)}
+              className="text-xs text-red-600 underline mt-2"
+            >
+              Anular con Nota de Credito
+            </button>
+          )}
         </div>
       ))}
     </div>
