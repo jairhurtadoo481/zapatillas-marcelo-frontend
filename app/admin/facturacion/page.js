@@ -12,6 +12,9 @@ import {
   emitirComprobanteApi,
   obtenerComprobantes,
   emitirNotaCreditoApi,
+  desbloquearFacturacionApi,
+  bloquearFacturacion,
+  tieneDesbloqueoFacturacion,
 } from "../../../lib/api";
 
 const MOTIVOS_NOTA_CREDITO = [
@@ -39,6 +42,73 @@ const UNIDADES_MEDIDA = ["UNIDAD", "PAR", "DOCENA", "CAJA"];
 const CUENTAS_PAGO = ["EFECTIVO", "YAPE", "PLIN", "TRANSFERENCIA", "TARJETA"];
 
 export default function FacturacionPage() {
+  return (
+    <ProtegerAdmin>
+      <AccesoFacturacion />
+    </ProtegerAdmin>
+  );
+}
+
+function AccesoFacturacion() {
+  const [desbloqueado, setDesbloqueado] = useState(() => tieneDesbloqueoFacturacion());
+
+  useEffect(() => {
+    const alBloquear = () => setDesbloqueado(false);
+    window.addEventListener("facturacion-bloqueada", alBloquear);
+    return () => window.removeEventListener("facturacion-bloqueada", alBloquear);
+  }, []);
+
+  if (!desbloqueado) {
+    return <PantallaBloqueo onDesbloqueado={() => setDesbloqueado(true)} />;
+  }
+  return <PanelFacturacion />;
+}
+
+function PantallaBloqueo({ onDesbloqueado }) {
+  const [codigo, setCodigo] = useState("");
+  const [error, setError] = useState("");
+  const [enviando, setEnviando] = useState(false);
+
+  const desbloquear = async (e) => {
+    e.preventDefault();
+    if (!codigo) return;
+    setEnviando(true);
+    setError("");
+    try {
+      await desbloquearFacturacionApi(obtenerToken(), codigo);
+      onDesbloqueado();
+    } catch (err) {
+      setError(err.message);
+      setCodigo("");
+      setEnviando(false);
+    }
+  };
+
+  return (
+    <div className="bg-white min-h-screen">
+      <div className="max-w-sm mx-auto px-4 py-16">
+        <h1 className="text-2xl font-bold mb-2 text-gray-900">Facturacion Electronica</h1>
+        <p className="text-sm text-gray-500 mb-6">Ingresa el codigo de acceso para continuar.</p>
+        <form onSubmit={desbloquear} className="space-y-3">
+          <input
+            type="password"
+            autoFocus
+            placeholder="Codigo de acceso"
+            value={codigo}
+            onChange={(e) => setCodigo(e.target.value)}
+            className="border border-gray-300 rounded px-3 py-2 w-full text-sm text-gray-900"
+          />
+          {error && <p className="text-red-600 text-sm">{error}</p>}
+          <button disabled={enviando} className="bg-gray-900 text-white text-sm px-4 py-2 rounded w-full">
+            {enviando ? "Verificando..." : "Desbloquear"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function PanelFacturacion() {
   const [tab, setTab] = useState("emitir");
   const [config, setConfig] = useState(null);
   const [cargando, setCargando] = useState(true);
@@ -61,10 +131,18 @@ export default function FacturacionPage() {
   }, []);
 
   return (
-    <ProtegerAdmin>
+    <>
       <div className="bg-white min-h-screen">
         <div className="max-w-5xl mx-auto px-4 py-8">
-          <h1 className="text-2xl font-bold mb-6 text-gray-900">Facturacion Electronica</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">Facturacion Electronica</h1>
+            <button
+              onClick={bloquearFacturacion}
+              className="border border-gray-300 text-gray-700 text-sm px-3 py-1.5 rounded"
+            >
+              Bloquear
+            </button>
+          </div>
 
           <div className="flex gap-2 mb-6 border-b border-gray-200">
             {[
@@ -99,7 +177,7 @@ export default function FacturacionPage() {
           )}
         </div>
       </div>
-    </ProtegerAdmin>
+    </>
   );
 }
 
@@ -110,8 +188,10 @@ function TabConfiguracion({ config, recargar }) {
     nombreComercial: config.nombreComercial || "",
     direccion: config.direccion || "",
     ambiente: config.ambiente || "beta",
-    serieBoleta: config.series?.boleta || "B001",
-    serieFactura: config.series?.factura || "F001",
+    serieBoleta: config.series?.boleta || "BA01",
+    serieFactura: config.series?.factura || "FA01",
+    serieNotaCreditoBoleta: config.series?.notaCreditoBoleta || "BN01",
+    serieNotaCreditoFactura: config.series?.notaCreditoFactura || "FN01",
   });
   const [sol, setSol] = useState({ usuarioSol: "", claveSol: "" });
   const [certificado, setCertificado] = useState(null);
@@ -223,9 +303,23 @@ function TabConfiguracion({ config, recargar }) {
             className="border border-gray-300 rounded px-3 py-2 flex-1 text-sm text-gray-900"
           />
           <input
-            placeholder="Serie factura (ej. F002)"
+            placeholder="Serie factura (ej. FA01)"
             value={empresa.serieFactura}
             onChange={(e) => setEmpresa({ ...empresa, serieFactura: e.target.value.toUpperCase() })}
+            className="border border-gray-300 rounded px-3 py-2 flex-1 text-sm text-gray-900"
+          />
+        </div>
+        <div className="flex gap-2">
+          <input
+            placeholder="Serie nota de credito de boleta (ej. BN01)"
+            value={empresa.serieNotaCreditoBoleta}
+            onChange={(e) => setEmpresa({ ...empresa, serieNotaCreditoBoleta: e.target.value.toUpperCase() })}
+            className="border border-gray-300 rounded px-3 py-2 flex-1 text-sm text-gray-900"
+          />
+          <input
+            placeholder="Serie nota de credito de factura (ej. FN01)"
+            value={empresa.serieNotaCreditoFactura}
+            onChange={(e) => setEmpresa({ ...empresa, serieNotaCreditoFactura: e.target.value.toUpperCase() })}
             className="border border-gray-300 rounded px-3 py-2 flex-1 text-sm text-gray-900"
           />
         </div>
@@ -929,11 +1023,68 @@ function NotaCreditoModal({ comprobante, onCerrar, onEmitida }) {
 
 const TIPO_ETIQUETA = { boleta: "Boleta", factura: "Factura", nota_credito: "Nota de Credito" };
 
+const abrirWhatsApp = (telefono, comprobante) => {
+  const tipo = (TIPO_ETIQUETA[comprobante.tipo] || comprobante.tipo).toLowerCase();
+  const mensaje = `Hola! Aqui tienes tu ${tipo} ${comprobante.serie}-${comprobante.correlativo} por S/ ${comprobante.total.toFixed(2)}:\n${comprobante.pdfUrl}`;
+  window.open(`https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`, "_blank", "noopener,noreferrer");
+};
+
+function WhatsAppModal({ comprobante, onCerrar }) {
+  const [telefono, setTelefono] = useState("");
+  const valido = telefono.length === 9;
+
+  const enviar = () => {
+    abrirWhatsApp(telefono, comprobante);
+    onCerrar();
+  };
+
+  return (
+    <Modal titulo="Enviar por WhatsApp" onCerrar={onCerrar}>
+      <p className="text-sm text-gray-700">
+        Este cliente no tiene celular guardado. Escribe el numero para enviar{" "}
+        <span className="font-semibold">{comprobante.serie}-{comprobante.correlativo}</span> a {comprobante.cliente.nombre}.
+      </p>
+      <div>
+        <label className="text-xs text-gray-500">Celular (9 digitos)</label>
+        <input
+          autoFocus
+          inputMode="numeric"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value.replace(/\D/g, "").slice(0, 9))}
+          onKeyDown={(e) => e.key === "Enter" && valido && enviar()}
+          className="border border-gray-300 rounded px-3 py-2 w-full text-sm text-gray-900"
+        />
+      </div>
+      <div className="flex gap-2 pt-2">
+        <button
+          onClick={enviar}
+          disabled={!valido}
+          className="bg-green-700 text-white text-sm font-medium px-4 py-2 rounded flex-1 disabled:opacity-40"
+        >
+          Abrir WhatsApp
+        </button>
+        <button onClick={onCerrar} className="bg-gray-200 text-gray-800 text-sm px-4 py-2 rounded">
+          Cancelar
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 function TabHistorial() {
   const [comprobantes, setComprobantes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [comprobanteParaAnular, setComprobanteParaAnular] = useState(null);
+  const [comprobanteParaWhatsApp, setComprobanteParaWhatsApp] = useState(null);
+
+  const enviarPorWhatsApp = (comprobante) => {
+    if (/^\d{9}$/.test(comprobante.clienteTelefono || "")) {
+      abrirWhatsApp(comprobante.clienteTelefono, comprobante);
+    } else {
+      setComprobanteParaWhatsApp(comprobante);
+    }
+  };
 
   const cargar = async () => {
     try {
@@ -975,6 +1126,10 @@ function TabHistorial() {
         />
       )}
 
+      {comprobanteParaWhatsApp && (
+        <WhatsAppModal comprobante={comprobanteParaWhatsApp} onCerrar={() => setComprobanteParaWhatsApp(null)} />
+      )}
+
       {comprobantes.map((c) => (
         <div key={c._id} className="border border-gray-200 rounded-lg p-3 text-sm">
           <div className="flex items-center justify-between">
@@ -999,6 +1154,14 @@ function TabHistorial() {
                 <a href={c.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-gray-600">
                   PDF
                 </a>
+              )}
+              {c.estado === "aceptado" && c.pdfUrl && !c.anulado && (
+                <button
+                  onClick={() => enviarPorWhatsApp(c)}
+                  className="block ml-auto text-xs underline text-green-700"
+                >
+                  WhatsApp
+                </button>
               )}
             </div>
           </div>
