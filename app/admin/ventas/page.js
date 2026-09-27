@@ -36,7 +36,7 @@ const formatearHora = (fecha) => {
   return d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
 };
 
-const nombreMetodo = { yape: "Yape", plin: "Plin" };
+const nombreMetodo = { yape: "Yape", plin: "Plin", bcp: "BCP" };
 const nombreSucursal = { sucursal1: "Sucursal 1", sucursal2: "Sucursal 2" };
 const COLORES = ["#000000", "#6b7280", "#a855f7", "#f97316"];
 

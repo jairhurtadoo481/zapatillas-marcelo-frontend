@@ -12,6 +12,10 @@ import {
   emitirComprobanteApi,
   obtenerComprobantes,
   emitirNotaCreditoApi,
+  reenviarComprobanteApi,
+  descargarReporteCsv,
+  descargarReporteZip,
+  enviarReporteGoogleSheetsApi,
   desbloquearFacturacionApi,
   bloquearFacturacion,
   tieneDesbloqueoFacturacion,
@@ -40,6 +44,30 @@ const CLIENTE_VACIO = {
 };
 const UNIDADES_MEDIDA = ["UNIDAD", "PAR", "DOCENA", "CAJA"];
 const CUENTAS_PAGO = ["EFECTIVO", "YAPE", "PLIN", "TRANSFERENCIA", "TARJETA"];
+const DOCUMENTO_CLIENTE_VARIOS = "00000000";
+const LIMITE_BOLETA_SIN_IDENTIFICAR = 700;
+const CLIENTE_VARIOS = {
+  tipoDocumento: "DNI",
+  documento: DOCUMENTO_CLIENTE_VARIOS,
+  nombre: "CLIENTE VARIOS",
+  direccion: "",
+  telefono: "",
+  correo: "",
+  contacto: "",
+  referencia: "",
+};
+const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+const descargarBlob = (blob, nombre) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nombre;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
 
 export default function FacturacionPage() {
   return (
@@ -360,6 +388,26 @@ function TabConfiguracion({ config, recargar }) {
         <p className="text-xs text-gray-500">
           {config.tieneCertificado ? "Ya hay un certificado guardado. Sube uno nuevo para reemplazarlo." : "Aun no se ha subido un certificado."}
         </p>
+        {config.certificado && !config.certificado.error && (
+          <p
+            className={`text-xs font-medium rounded px-3 py-2 ${
+              config.certificado.diasRestantes < 0
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : config.certificado.diasRestantes <= 7
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : config.certificado.diasRestantes <= 30
+                ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                : "text-gray-500"
+            }`}
+          >
+            {config.certificado.diasRestantes < 0
+              ? `El certificado vencio el ${new Date(config.certificado.vigenteHasta).toLocaleDateString("es-PE")}. Sube uno nuevo antes de seguir emitiendo.`
+              : `Vence el ${new Date(config.certificado.vigenteHasta).toLocaleDateString("es-PE")} (en ${config.certificado.diasRestantes} dias).`}
+          </p>
+        )}
+        {config.certificado?.error && (
+          <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{config.certificado.error}</p>
+        )}
         <input
           type="file"
           accept=".p12,.pfx"
@@ -682,6 +730,9 @@ function TabEmitir({ config, recargar }) {
     setError("");
   };
 
+  const clienteVariosSuperaElLimite =
+    cliente?.documento === DOCUMENTO_CLIENTE_VARIOS && total >= LIMITE_BOLETA_SIN_IDENTIFICAR;
+
   const emitir = async () => {
     setError("");
     if (!cliente) {
@@ -690,6 +741,10 @@ function TabEmitir({ config, recargar }) {
     }
     if (items.length === 0) {
       setError("Agrega al menos un item");
+      return;
+    }
+    if (clienteVariosSuperaElLimite) {
+      setError(`Para S/ ${total.toFixed(2)} debes identificar al cliente (obligatorio desde S/ ${LIMITE_BOLETA_SIN_IDENTIFICAR})`);
       return;
     }
     setEmitiendo(true);
@@ -810,6 +865,11 @@ function TabEmitir({ config, recargar }) {
                 {cliente.tipoDocumento}: {cliente.documento}
                 {cliente.telefono ? ` · Cel. ${cliente.telefono}` : ""}
               </p>
+              {cliente.documento === DOCUMENTO_CLIENTE_VARIOS && (
+                <p className="text-xs text-yellow-700">
+                  Cliente sin identificar. Solo valido para boletas menores a S/ {LIMITE_BOLETA_SIN_IDENTIFICAR}.
+                </p>
+              )}
             </div>
             <button
               onClick={() => setClienteModalAbierto(true)}
@@ -819,12 +879,22 @@ function TabEmitir({ config, recargar }) {
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => setClienteModalAbierto(true)}
-            className="bg-gray-900 text-white text-sm px-4 py-2 rounded"
-          >
-            + Cliente Nuevo
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setClienteModalAbierto(true)}
+              className="bg-gray-900 text-white text-sm px-4 py-2 rounded"
+            >
+              + Cliente Nuevo
+            </button>
+            {tipo === "boleta" && (
+              <button
+                onClick={() => setCliente(CLIENTE_VARIOS)}
+                className="border border-gray-300 text-gray-700 text-sm px-4 py-2 rounded"
+              >
+                Cliente Varios (menos de S/ {LIMITE_BOLETA_SIN_IDENTIFICAR})
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -910,6 +980,11 @@ function TabEmitir({ config, recargar }) {
           <div className="text-right">
             <p className="text-xs text-gray-500">Importe Total</p>
             <p className="text-3xl font-bold text-gray-900">S/ {total.toFixed(2)}</p>
+            {clienteVariosSuperaElLimite && (
+              <p className="text-xs text-red-600 mt-1">
+                Debes identificar al cliente para emitir S/ {LIMITE_BOLETA_SIN_IDENTIFICAR} o mas.
+              </p>
+            )}
           </div>
           <div className="flex gap-2 justify-end mt-4">
             <button onClick={cancelar} className="bg-red-100 text-red-700 text-sm font-medium px-5 py-3 rounded">
@@ -917,8 +992,8 @@ function TabEmitir({ config, recargar }) {
             </button>
             <button
               onClick={emitir}
-              disabled={emitiendo}
-              className="bg-green-700 text-white text-sm font-medium px-6 py-3 rounded"
+              disabled={emitiendo || clienteVariosSuperaElLimite}
+              className="bg-green-700 text-white text-sm font-medium px-6 py-3 rounded disabled:opacity-40"
             >
               {emitiendo ? "Emitiendo..." : "Emitir"}
             </button>
@@ -1071,18 +1146,127 @@ function WhatsAppModal({ comprobante, onCerrar }) {
   );
 }
 
+function ReportesMensuales() {
+  const ahora = new Date();
+  const [anio, setAnio] = useState(ahora.getFullYear());
+  const [mes, setMes] = useState(ahora.getMonth() + 1);
+  const [descargando, setDescargando] = useState("");
+  const [error, setError] = useState("");
+  const [mensajeSheets, setMensajeSheets] = useState("");
+
+  const descargar = async (tipo) => {
+    setDescargando(tipo);
+    setError("");
+    setMensajeSheets("");
+    try {
+      const token = obtenerToken();
+      const blob = tipo === "csv" ? await descargarReporteCsv(token, anio, mes) : await descargarReporteZip(token, anio, mes);
+      const extension = tipo === "csv" ? "csv" : "zip";
+      const prefijo = tipo === "csv" ? "reporte" : "comprobantes";
+      descargarBlob(blob, `${prefijo}-${anio}-${String(mes).padStart(2, "0")}.${extension}`);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDescargando("");
+    }
+  };
+
+  const enviarASheets = async () => {
+    setDescargando("sheets");
+    setError("");
+    setMensajeSheets("");
+    try {
+      const data = await enviarReporteGoogleSheetsApi(obtenerToken(), anio, mes);
+      setMensajeSheets(data.mensaje);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDescargando("");
+    }
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-4">
+      <p className="font-semibold text-gray-900 mb-3">Reporte para el contador</p>
+      <div className="flex flex-wrap items-end gap-3">
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Mes</label>
+          <select
+            value={mes}
+            onChange={(e) => setMes(Number(e.target.value))}
+            className="border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-900"
+          >
+            {MESES.map((nombre, i) => (
+              <option key={nombre} value={i + 1}>
+                {nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Año</label>
+          <input
+            type="number"
+            value={anio}
+            onChange={(e) => setAnio(Number(e.target.value))}
+            className="border border-gray-300 rounded px-2 py-1.5 w-24 text-sm text-gray-900"
+          />
+        </div>
+        <button
+          onClick={() => descargar("csv")}
+          disabled={Boolean(descargando)}
+          className="bg-gray-900 text-white text-sm px-3 py-1.5 rounded"
+        >
+          {descargando === "csv" ? "Generando..." : "Descargar Excel (CSV)"}
+        </button>
+        <button
+          onClick={() => descargar("zip")}
+          disabled={Boolean(descargando)}
+          className="border border-gray-300 text-gray-800 text-sm px-3 py-1.5 rounded"
+        >
+          {descargando === "zip" ? "Generando..." : "Descargar XML y CDR (ZIP)"}
+        </button>
+        <button
+          onClick={enviarASheets}
+          disabled={Boolean(descargando)}
+          className="border border-gray-300 text-gray-800 text-sm px-3 py-1.5 rounded"
+        >
+          {descargando === "sheets" ? "Enviando..." : "Enviar a Google Sheets"}
+        </button>
+      </div>
+      {mensajeSheets && <p className="text-green-700 text-sm mt-2">{mensajeSheets}</p>}
+      {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+    </div>
+  );
+}
+
 function TabHistorial() {
   const [comprobantes, setComprobantes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [comprobanteParaAnular, setComprobanteParaAnular] = useState(null);
   const [comprobanteParaWhatsApp, setComprobanteParaWhatsApp] = useState(null);
+  const [reenviandoId, setReenviandoId] = useState(null);
+  const [errorReenvio, setErrorReenvio] = useState("");
 
   const enviarPorWhatsApp = (comprobante) => {
     if (/^\d{9}$/.test(comprobante.clienteTelefono || "")) {
       abrirWhatsApp(comprobante.clienteTelefono, comprobante);
     } else {
       setComprobanteParaWhatsApp(comprobante);
+    }
+  };
+
+  const reenviar = async (id) => {
+    setReenviandoId(id);
+    setErrorReenvio("");
+    try {
+      await reenviarComprobanteApi(obtenerToken(), id);
+      await cargar();
+    } catch (err) {
+      setErrorReenvio(err.message);
+    } finally {
+      setReenviandoId(null);
     }
   };
 
@@ -1104,7 +1288,6 @@ function TabHistorial() {
 
   if (cargando) return <p className="text-gray-500">Cargando...</p>;
   if (error) return <p className="text-red-600 text-sm">{error}</p>;
-  if (comprobantes.length === 0) return <p className="text-gray-500 text-sm">Aun no hay comprobantes emitidos.</p>;
 
   const colorEstado = {
     aceptado: "text-green-700",
@@ -1115,6 +1298,8 @@ function TabHistorial() {
 
   return (
     <div className="space-y-2">
+      <ReportesMensuales />
+
       {comprobanteParaAnular && (
         <NotaCreditoModal
           comprobante={comprobanteParaAnular}
@@ -1129,6 +1314,10 @@ function TabHistorial() {
       {comprobanteParaWhatsApp && (
         <WhatsAppModal comprobante={comprobanteParaWhatsApp} onCerrar={() => setComprobanteParaWhatsApp(null)} />
       )}
+
+      {errorReenvio && <p className="text-red-600 text-sm">{errorReenvio}</p>}
+
+      {comprobantes.length === 0 && <p className="text-gray-500 text-sm">Aun no hay comprobantes emitidos.</p>}
 
       {comprobantes.map((c) => (
         <div key={c._id} className="border border-gray-200 rounded-lg p-3 text-sm">
@@ -1171,6 +1360,15 @@ function TabHistorial() {
               className="text-xs text-red-600 underline mt-2"
             >
               Anular con Nota de Credito
+            </button>
+          )}
+          {c.estado === "error" && (
+            <button
+              onClick={() => reenviar(c._id)}
+              disabled={reenviandoId === c._id}
+              className="text-xs text-blue-600 underline mt-2"
+            >
+              {reenviandoId === c._id ? "Reenviando..." : "Reenviar a SUNAT"}
             </button>
           )}
         </div>

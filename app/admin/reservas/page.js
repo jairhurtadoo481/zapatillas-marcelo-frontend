@@ -17,6 +17,7 @@ const formatearFecha = (fecha) => {
 const nombreMetodo = {
   yape: "Yape",
   plin: "Plin",
+  bcp: "BCP",
 };
 
 const nombreSucursal = {

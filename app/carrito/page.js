@@ -9,6 +9,7 @@ import {
   vaciarCarrito,
 } from "../../lib/carrito";
 import { crearReserva, subirComprobante, obtenerConfiguracion } from "../../lib/api";
+import { NEGOCIO } from "../../lib/negocio";
 
 const claseInput = "border border-gray-300 rounded px-3 py-2 bg-white text-gray-900 placeholder-gray-400";
 
@@ -31,6 +32,7 @@ export default function CarritoPage() {
     direccion: "",
   });
 
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [metodoPago, setMetodoPago] = useState("");
   const [config, setConfig] = useState({ qrYape: null, qrPlin: null, qrBcp: null });
   const [archivoComprobante, setArchivoComprobante] = useState(null);
@@ -98,6 +100,8 @@ export default function CarritoPage() {
           direccion: form.entregaDomicilio ? form.direccion : "",
         },
         metodoPago,
+        aceptoTerminos: aceptaTerminos,
+        versionTerminos: NEGOCIO.versionLegal,
       };
 
       const reserva = await crearReserva(payload);
@@ -279,6 +283,27 @@ export default function CarritoPage() {
                   required
                 />
               )}
+
+              <label className="flex items-start gap-2 text-sm text-gray-900">
+                <input
+                  type="checkbox"
+                  checked={aceptaTerminos}
+                  onChange={(e) => setAceptaTerminos(e.target.checked)}
+                  className="mt-1"
+                  required
+                />
+                <span>
+                  He leído y acepto los{" "}
+                  <Link href="/terminos" target="_blank" className="underline text-blue-700">
+                    Términos y Condiciones
+                  </Link>{" "}
+                  y la{" "}
+                  <Link href="/privacidad" target="_blank" className="underline text-blue-700">
+                    Política de Privacidad
+                  </Link>
+                  .
+                </span>
+              </label>
 
               <button
                 type="submit"

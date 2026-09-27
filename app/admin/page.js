@@ -175,6 +175,14 @@ export default function AdminPage() {
               <p className="font-semibold text-lg text-gray-900">Facturacion Electronica</p>
               <p className="text-sm text-gray-500">Emitir boletas y facturas electronicas vinculadas a SUNAT</p>
             </Link>
+
+            <Link
+              href="/admin/reclamos"
+              className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
+            >
+              <p className="font-semibold text-lg text-gray-900">Libro de Reclamaciones</p>
+              <p className="text-sm text-gray-500">Ver y responder los reclamos y quejas de los clientes</p>
+            </Link>
           </div>
         </div>
       </div>

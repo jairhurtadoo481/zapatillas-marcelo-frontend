@@ -34,6 +34,12 @@ export default async function sitemap() {
       changeFrequency: "daily",
       priority: 0.7,
     },
+    ...["contacto", "terminos", "privacidad", "libro-de-reclamaciones"].map((pagina) => ({
+      url: `${SITE_URL}/${pagina}`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    })),
   ];
 
   let paginasProductos = [];

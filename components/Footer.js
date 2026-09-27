@@ -11,7 +11,7 @@ export default function Footer() {
           <div>
             <h3 className="text-2xl font-bold text-white mb-4">La Casa de Marcelo</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
-              La mejor tienda de zapatillas originales en Andahuaylas, Apur\u00edmac. Marcas reales, precios justos.
+              La mejor tienda de zapatillas originales en Andahuaylas, Apurímac. Marcas reales, precios justos.
             </p>
           </div>
 
@@ -52,17 +52,17 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white text-sm transition">
+                <Link href="/privacidad" className="text-gray-400 hover:text-white text-sm transition">
                   Politica de Privacidad
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white text-sm transition">
+                <Link href="/terminos" className="text-gray-400 hover:text-white text-sm transition">
                   Terminos y Condiciones
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white text-sm transition">
+                <Link href="/contacto" className="text-gray-400 hover:text-white text-sm transition">
                   Contacto
                 </Link>
               </li>
@@ -95,7 +95,7 @@ export default function Footer() {
         <div className="border-t border-white/20 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-gray-400 uppercase tracking-wider">
-              \u00a9 {currentYear} La Casa de Marcelo. Todos los derechos reservados.
+              © {currentYear} La Casa de Marcelo. Todos los derechos reservados.
             </p>
             <div className="flex gap-6">
               <Link href="/" className="text-gray-400 hover:text-white transition">
@@ -110,16 +110,29 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Libro de Reclamaciones */}
+          <div className="mt-6 flex justify-center">
+            <Link
+              href="/libro-de-reclamaciones"
+              className="inline-flex items-center gap-2 border border-white/30 rounded px-4 py-2 text-xs font-semibold text-gray-200 hover:text-white hover:border-white transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+              </svg>
+              Libro de Reclamaciones
+            </Link>
+          </div>
+
           {/* Links discretos para admin y trabajador */}
           <div className="mt-6 pt-6 border-t border-gray-700 flex justify-center gap-4">
             <Link href="/admin/login" className="text-xs text-gray-500 hover:text-gray-300 transition underline">
               Admin
             </Link>
-            <span className="text-gray-600">\u2022</span>
+            <span className="text-gray-600">•</span>
             <Link href="/mayorista/login" className="text-xs text-gray-500 hover:text-gray-300 transition underline">
               Mayorista
             </Link>
-            <span className="text-gray-600">\u2022</span>
+            <span className="text-gray-600">•</span>
             <Link href="/trabajador/login" className="text-xs text-gray-500 hover:text-gray-300 transition underline">
               Trabajador
             </Link>
