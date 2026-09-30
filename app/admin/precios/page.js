@@ -17,6 +17,7 @@ const marcas = [
   "Underarmour",
   "Nacionales (Marcelo)",
   "Ni Air Running",
+  "Reebok",
 ];
 
 export default function AdminPreciosPage() {

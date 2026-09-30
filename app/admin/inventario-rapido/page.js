@@ -25,6 +25,7 @@ const marcas = [
   "Underarmour",
   "Nacionales (Marcelo)",
   "Ni Air Running",
+  "Reebok",
 ];
 
 const TALLAS_DEFECTO = [

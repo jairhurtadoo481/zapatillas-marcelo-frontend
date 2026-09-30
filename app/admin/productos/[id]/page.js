@@ -26,6 +26,7 @@ const marcas = [
   "Underarmour",
   "Nacionales (Marcelo)",
   "Ni Air Running",
+  "Reebok",
 ];
 
 const MARCA_CON_REPLICA = "Nacionales (Marcelo)";

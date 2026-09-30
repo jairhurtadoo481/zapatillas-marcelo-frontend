@@ -12,6 +12,10 @@ import {
   emitirComprobanteApi,
   obtenerComprobantes,
   emitirNotaCreditoApi,
+  obtenerFactilizaTokensApi,
+  agregarFactilizaTokenApi,
+  actualizarFactilizaTokenApi,
+  eliminarFactilizaTokenApi,
   reenviarComprobanteApi,
   descargarReporteCsv,
   descargarReporteZip,
@@ -425,6 +429,188 @@ function TabConfiguracion({ config, recargar }) {
           Guardar certificado
         </button>
       </form>
+
+      <FactilizaTokens />
+    </div>
+  );
+}
+
+function FactilizaTokens() {
+  const [tokens, setTokens] = useState(null);
+  const [error, setError] = useState("");
+  const [mensaje, setMensaje] = useState("");
+  const [mostrarForm, setMostrarForm] = useState(false);
+  const [nuevo, setNuevo] = useState({ token: "", etiqueta: "", usadosIniciales: "" });
+  const [guardando, setGuardando] = useState(false);
+  const [ocupado, setOcupado] = useState("");
+
+  const cargar = async () => {
+    try {
+      const data = await obtenerFactilizaTokensApi(obtenerToken());
+      setTokens(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    cargar();
+  }, []);
+
+  const agregar = async (e) => {
+    e.preventDefault();
+    if (!nuevo.token.trim()) return;
+    setGuardando(true);
+    setError("");
+    setMensaje("");
+    try {
+      await agregarFactilizaTokenApi(obtenerToken(), nuevo);
+      setNuevo({ token: "", etiqueta: "", usadosIniciales: "" });
+      setMostrarForm(false);
+      setMensaje("Cuenta agregada");
+      await cargar();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const cambiar = async (id, cambios) => {
+    setOcupado(id);
+    setError("");
+    setMensaje("");
+    try {
+      await actualizarFactilizaTokenApi(obtenerToken(), id, cambios);
+      await cargar();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setOcupado("");
+    }
+  };
+
+  const eliminar = async (id) => {
+    setOcupado(id);
+    setError("");
+    setMensaje("");
+    try {
+      await eliminarFactilizaTokenApi(obtenerToken(), id);
+      await cargar();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setOcupado("");
+    }
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="font-semibold text-gray-900">Cuentas de Factiliza (consulta DNI/RUC)</p>
+          <p className="text-xs text-gray-500">
+            Cada cuenta gratuita permite 100 consultas al mes. Cuando una llega a 98, el sistema pasa solo a la
+            siguiente cuenta activa.
+          </p>
+        </div>
+        <button onClick={() => setMostrarForm(!mostrarForm)} className="bg-gray-900 text-white text-sm px-3 py-1.5 rounded whitespace-nowrap">
+          {mostrarForm ? "Cancelar" : "+ Agregar cuenta"}
+        </button>
+      </div>
+
+      {mostrarForm && (
+        <form onSubmit={agregar} className="border border-gray-200 rounded p-3 space-y-2 bg-gray-50">
+          <input
+            placeholder="Token de la cuenta"
+            value={nuevo.token}
+            onChange={(e) => setNuevo({ ...nuevo, token: e.target.value })}
+            className="border border-gray-300 rounded px-3 py-2 w-full text-sm text-gray-900"
+          />
+          <div className="flex gap-2">
+            <input
+              placeholder="Etiqueta (ej. correo de la cuenta)"
+              value={nuevo.etiqueta}
+              onChange={(e) => setNuevo({ ...nuevo, etiqueta: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2 flex-1 text-sm text-gray-900"
+            />
+            <input
+              type="number"
+              min="0"
+              placeholder="Ya usadas (si no es nueva)"
+              value={nuevo.usadosIniciales}
+              onChange={(e) => setNuevo({ ...nuevo, usadosIniciales: e.target.value })}
+              className="border border-gray-300 rounded px-3 py-2 w-44 text-sm text-gray-900"
+            />
+          </div>
+          <button disabled={guardando} className="bg-green-700 text-white text-sm px-4 py-2 rounded">
+            {guardando ? "Guardando..." : "Guardar cuenta"}
+          </button>
+        </form>
+      )}
+
+      {mensaje && <p className="text-green-700 text-sm">{mensaje}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
+
+      {tokens === null ? (
+        <p className="text-sm text-gray-500">Cargando...</p>
+      ) : tokens.length === 0 ? (
+        <p className="text-sm text-gray-500">Aun no hay ninguna cuenta guardada.</p>
+      ) : (
+        <div className="space-y-2">
+          {tokens.map((t) => {
+            const agotada = t.usados >= t.limite;
+            const porcentaje = Math.min(100, Math.round((t.usados / t.limite) * 100));
+            return (
+              <div key={t._id} className="border border-gray-200 rounded p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium text-gray-900">
+                    {t.etiqueta || "(sin etiqueta)"}
+                    {!t.activo && <span className="ml-2 text-xs text-gray-500">(desactivada)</span>}
+                  </p>
+                  <p className={`text-xs font-semibold ${agotada ? "text-red-600" : "text-gray-600"}`}>
+                    {t.usados} / {t.limite}
+                  </p>
+                </div>
+                <div className="w-full h-1.5 bg-gray-200 rounded overflow-hidden mb-2">
+                  <div
+                    className={`h-full ${agotada ? "bg-red-500" : "bg-green-600"}`}
+                    style={{ width: `${porcentaje}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-400">
+                    Se reinicia el {new Date(t.proximoReinicio).toLocaleDateString("es-PE")}
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => cambiar(t._id, { reiniciarContador: true })}
+                      disabled={ocupado === t._id}
+                      className="text-xs text-blue-600 underline"
+                    >
+                      Reiniciar contador
+                    </button>
+                    <button
+                      onClick={() => cambiar(t._id, { activo: !t.activo })}
+                      disabled={ocupado === t._id}
+                      className="text-xs text-gray-600 underline"
+                    >
+                      {t.activo ? "Desactivar" : "Activar"}
+                    </button>
+                    <button
+                      onClick={() => eliminar(t._id)}
+                      disabled={ocupado === t._id}
+                      className="text-xs text-red-600 underline"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
