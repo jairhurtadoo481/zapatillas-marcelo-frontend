@@ -2,6 +2,7 @@ import { obtenerProductos } from "../lib/api";
 import ProductoCard from "../components/ProductoCard";
 import HeroInicio from "../components/HeroInicio";
 import MarcasDestacadas from "../components/MarcasDestacadas";
+import Ubicacion from "../components/Ubicacion";
 
 export default async function Home() {
   let destacados = [];
@@ -35,6 +36,8 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <Ubicacion />
     </div>
   );
 }

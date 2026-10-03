@@ -13,7 +13,6 @@ export default function ContactoPage() {
   const enlaceWhatsapp = whatsapp
     ? `https://wa.me/${whatsapp}?text=${encodeURIComponent("Hola! Quisiera hacer una consulta.")}`
     : null;
-  const enlaceMapa = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(NEGOCIO.direccion)}`;
 
   return (
     <div className="bg-white min-h-screen">
@@ -61,15 +60,23 @@ export default function ContactoPage() {
 
           <div className={`${claseTarjeta} sm:col-span-2`}>
             <h2 className="font-semibold text-gray-900 mb-2">Ubicación</h2>
-            <p className="text-sm text-gray-700">{NEGOCIO.direccion}</p>
-            <a
-              href={enlaceMapa}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm underline text-blue-700 inline-block mt-1"
-            >
-              Ver en Google Maps
-            </a>
+            <div className="space-y-3">
+              {NEGOCIO.sucursales.map((s) => (
+                <div key={s.id}>
+                  <p className="text-sm font-medium text-gray-900">{s.nombre}</p>
+                  <p className="text-sm text-gray-700">{s.direccion}</p>
+                  {s.referencia && <p className="text-xs text-gray-500">{s.referencia}</p>}
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.direccion)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm underline text-blue-700 inline-block mt-1"
+                  >
+                    Ver en Google Maps
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
