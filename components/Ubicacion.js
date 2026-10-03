@@ -30,13 +30,9 @@ export default function Ubicacion() {
   const [estado, setEstado] = useState({ cargando: false, mensaje: "", error: "" });
 
   const sucursal = NEGOCIO.sucursales.find((s) => s.id === seleccionada);
-  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP;
 
   const urlMapa = `https://www.google.com/maps?q=${encodeURIComponent(sucursal.direccion)}&hl=es&z=18&output=embed`;
   const urlRuta = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(sucursal.direccion)}&travelmode=walking`;
-  const urlWhatsapp = whatsapp
-    ? `https://wa.me/${whatsapp}?text=${encodeURIComponent("Hola! Quisiera consultar por unas zapatillas.")}`
-    : null;
 
   const calcularDistancia = () => {
     if (!navigator.geolocation) {
@@ -128,25 +124,6 @@ export default function Ubicacion() {
             </button>
             {estado.mensaje && <p className="text-green-400 text-sm">{estado.mensaje}</p>}
             {estado.error && <p className="text-red-400 text-sm">{estado.error}</p>}
-          </div>
-
-          <div className="flex gap-2">
-            <a
-              href={`tel:${NEGOCIO.telefonoPrincipal.tel}`}
-              className="flex-1 text-center border border-white/30 rounded py-2 text-sm hover:border-white transition"
-            >
-              Llamar
-            </a>
-            {urlWhatsapp && (
-              <a
-                href={urlWhatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center bg-green-600 hover:bg-green-700 rounded py-2 text-sm font-semibold transition"
-              >
-                WhatsApp
-              </a>
-            )}
           </div>
         </div>
       </div>
