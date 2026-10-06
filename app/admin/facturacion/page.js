@@ -24,6 +24,7 @@ import {
   bloquearFacturacion,
   tieneDesbloqueoFacturacion,
 } from "../../../lib/api";
+import { enlaceComprobante } from "../../../lib/comprobantes";
 
 const MOTIVOS_NOTA_CREDITO = [
   ["01", "Anulacion de la operacion"],
@@ -1201,14 +1202,14 @@ function TabEmitir({ config, recargar }) {
           <p>{resultado.observaciones}</p>
           <div className="flex gap-4 mt-2">
             {resultado.pdfUrl && (
-              <a href={resultado.pdfUrl} target="_blank" rel="noopener noreferrer" className="underline">
+              <a href={enlaceComprobante(resultado.pdfUrl)} target="_blank" rel="noopener noreferrer" className="underline">
                 Descargar PDF
               </a>
             )}
             {resultado.estado === "aceptado" && resultado.pdfUrl && whatsappTelefono.length === 9 && (
               <a
                 href={`https://wa.me/51${whatsappTelefono}?text=${encodeURIComponent(
-                  `Hola! Aqui tienes tu ${resultado.tipo} ${resultado.serie}-${resultado.correlativo} por S/ ${resultado.total.toFixed(2)}:\n${resultado.pdfUrl}`
+                  `Hola! Aqui tienes tu ${resultado.tipo} ${resultado.serie}-${resultado.correlativo} por S/ ${resultado.total.toFixed(2)}:\n${enlaceComprobante(resultado.pdfUrl)}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1286,7 +1287,7 @@ const TIPO_ETIQUETA = { boleta: "Boleta", factura: "Factura", nota_credito: "Not
 
 const abrirWhatsApp = (telefono, comprobante) => {
   const tipo = (TIPO_ETIQUETA[comprobante.tipo] || comprobante.tipo).toLowerCase();
-  const mensaje = `Hola! Aqui tienes tu ${tipo} ${comprobante.serie}-${comprobante.correlativo} por S/ ${comprobante.total.toFixed(2)}:\n${comprobante.pdfUrl}`;
+  const mensaje = `Hola! Aqui tienes tu ${tipo} ${comprobante.serie}-${comprobante.correlativo} por S/ ${comprobante.total.toFixed(2)}:\n${enlaceComprobante(comprobante.pdfUrl)}`;
   window.open(`https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`, "_blank", "noopener,noreferrer");
 };
 
@@ -1526,7 +1527,7 @@ function TabHistorial() {
                 {c.anulado ? "ANULADO" : c.estado.toUpperCase()}
               </p>
               {c.pdfUrl && (
-                <a href={c.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-gray-600">
+                <a href={enlaceComprobante(c.pdfUrl)} target="_blank" rel="noopener noreferrer" className="text-xs underline text-gray-600">
                   PDF
                 </a>
               )}
