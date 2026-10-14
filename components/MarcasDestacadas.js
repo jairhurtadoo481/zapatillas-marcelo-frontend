@@ -18,6 +18,7 @@ const MARCAS = [
   { nombre: "Ni Air Running", archivo: "/NIAIRRUNNING.png" },
   { nombre: "Nacionales (Marcelo)", archivo: "/marcelo.png" },
   { nombre: "Reebok", archivo: "/Reeboklogo.png" },
+  { nombre: "Asics", archivo: "/Asics.png" },
 ];
 
 export default function MarcasDestacadas() {

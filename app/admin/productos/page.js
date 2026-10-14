@@ -37,6 +37,7 @@ const marcas = [
   "Nacionales (Marcelo)",
   "Ni Air Running",
   "Reebok",
+  "Asics",
 ];
 
 const claseSelect = "text-sm border border-gray-300 rounded px-3 py-2 bg-white text-gray-900";

@@ -18,6 +18,7 @@ const marcas = [
   "Nacionales (Marcelo)",
   "Ni Air Running",
   "Reebok",
+  "Asics",
 ];
 
 export default function AdminPreciosPage() {
