@@ -161,6 +161,14 @@ export default function AdminPage() {
             </Link>
 
             <Link
+              href="/admin/ofertas"
+              className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
+            >
+              <p className="font-semibold text-lg text-gray-900">Ofertas</p>
+              <p className="text-sm text-gray-500">Descuentos por tiempo limitado para la tienda web</p>
+            </Link>
+
+            <Link
               href="/admin/configuracion"
               className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition bg-white"
             >

@@ -10,6 +10,7 @@ import {
 } from "../../lib/carrito";
 import { crearReserva, subirComprobante, obtenerConfiguracion } from "../../lib/api";
 import { NEGOCIO } from "../../lib/negocio";
+import { formatearPrecio } from "../../lib/formato";
 
 const claseInput = "border border-gray-300 rounded px-3 py-2 bg-white text-gray-900 placeholder-gray-400";
 
@@ -195,7 +196,7 @@ export default function CarritoPage() {
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">S/ {item.precioUnitario * item.cantidad}</p>
+                    <p className="font-semibold text-gray-900">S/ {formatearPrecio(item.precioUnitario * item.cantidad)}</p>
                     <button
                       onClick={() => quitar(item.productoId, item.talla)}
                       className="text-xs text-red-600 hover:underline"
@@ -209,7 +210,7 @@ export default function CarritoPage() {
 
             <div className="border-t border-gray-200 pt-4 flex items-center justify-between mb-6">
               <span className="font-semibold text-gray-900">Total</span>
-              <span className="text-xl font-bold text-gray-900">S/ {total}</span>
+              <span className="text-xl font-bold text-gray-900">S/ {formatearPrecio(total)}</span>
             </div>
 
             {algunaOferta && (
@@ -391,7 +392,7 @@ export default function CarritoPage() {
               )}
             </div>
 
-            <p className="text-lg font-bold mb-6 text-gray-900">Monto a pagar: S/ {total}</p>
+            <p className="text-lg font-bold mb-6 text-gray-900">Monto a pagar: S/ {formatearPrecio(total)}</p>
 
             <button
               onClick={irAComprobante}

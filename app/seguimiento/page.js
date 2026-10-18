@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { seguimientoReserva } from "../../lib/api";
+import { formatearPrecio } from "../../lib/formato";
 
 const colorEstado = {
   pendiente: "bg-yellow-100 text-yellow-700",
@@ -102,7 +103,7 @@ export default function SeguimientoPage() {
               ))}
             </div>
 
-            <p className="font-bold text-gray-900">Total: S/ {resultado.total}</p>
+            <p className="font-bold text-gray-900">Total: S/ {formatearPrecio(resultado.total)}</p>
           </div>
         )}
       </div>

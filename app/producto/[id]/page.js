@@ -1,4 +1,5 @@
 import { obtenerProductoPorId } from "../../../lib/api";
+import { formatearPrecio } from "../../../lib/formato";
 import GaleriaProducto from "../../../components/GaleriaProducto";
 import GuiaTallas from "../../../components/GuiaTallas";
 import ContadorOferta from "../../../components/ContadorOferta";
@@ -46,11 +47,11 @@ export default async function ProductoPage({ params }) {
           <div className="mt-6 flex items-center gap-4 pb-6 border-b-2 border-gray-200">
             {tieneOferta ? (
               <>
-                <span className="text-3xl font-bold text-red-600">S/ {producto.precioOferta}</span>
-                <span className="text-lg text-gray-400 line-through">S/ {producto.precio}</span>
+                <span className="text-3xl font-bold text-red-600">S/ {formatearPrecio(producto.precioOferta)}</span>
+                <span className="text-lg text-gray-400 line-through">S/ {formatearPrecio(producto.precio)}</span>
               </>
             ) : (
-              <span className="text-3xl font-bold text-gray-900">S/ {producto.precio}</span>
+              <span className="text-3xl font-bold text-gray-900">S/ {formatearPrecio(producto.precio)}</span>
             )}
           </div>
 

@@ -1,11 +1,18 @@
 import Link from "next/link";
+import { formatearPrecio } from "../lib/formato";
 
 export default function ProductoCard({ producto }) {
   const imagen = producto.imagenes && producto.imagenes.length > 0
     ? producto.imagenes[0]
     : null;
 
-  const tieneOferta = producto.precioOferta !== null && producto.precioOferta !== undefined;
+  // Solo mientras la oferta esta vigente; una vencida no se muestra ni se cobra.
+  const tieneOferta =
+    producto.ofertaActiva === true &&
+    producto.precioOferta !== null &&
+    producto.precioOferta !== undefined;
+  // El servidor marca como nuevo lo subido hace menos de 14 dias.
+  const nuevo = producto.esNuevo === true;
 
   return (
     <Link
@@ -30,6 +37,11 @@ export default function ProductoCard({ producto }) {
               Oferta
             </span>
           )}
+          {nuevo && (
+            <span className="absolute top-3 right-3 bg-emerald-500 text-white text-xs px-3 py-1.5 uppercase tracking-wide font-bold rounded-md shadow-lg">
+              Nuevo
+            </span>
+          )}
         </div>
         <div className="p-4 flex flex-col flex-grow justify-between">
           <div>
@@ -40,11 +52,11 @@ export default function ProductoCard({ producto }) {
             <div className="flex items-center gap-2">
               {tieneOferta ? (
                 <>
-                  <span className="text-lg font-bold text-red-600">S/ {producto.precioOferta}</span>
-                  <span className="text-gray-400 line-through text-xs">S/ {producto.precio}</span>
+                  <span className="text-lg font-bold text-red-600">S/ {formatearPrecio(producto.precioOferta)}</span>
+                  <span className="text-gray-400 line-through text-xs">S/ {formatearPrecio(producto.precio)}</span>
                 </>
               ) : (
-                <span className="text-lg font-bold text-gray-900">S/ {producto.precio}</span>
+                <span className="text-lg font-bold text-gray-900">S/ {formatearPrecio(producto.precio)}</span>
               )}
             </div>
           </div>
