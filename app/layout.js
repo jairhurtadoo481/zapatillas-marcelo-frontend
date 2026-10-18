@@ -2,6 +2,8 @@ import "./globals.css";
 import { Anton, Inter } from "next/font/google";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import RegistrarSW from "../components/RegistrarSW";
+import AvisoInstalar from "../components/AvisoInstalar";
 
 const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -12,6 +14,13 @@ export const metadata = {
   verification: {
     google: "5QJLTvzwUwKr-oZ9vk5653HDgSRTukKxxvpsI2W-x_o",
   },
+  applicationName: "La Casa de Marcelo",
+  appleWebApp: { capable: true, title: "Casa de Marcelo", statusBarStyle: "black" },
+  icons: { apple: "/apple-touch-icon.png" },
+};
+
+export const viewport = {
+  themeColor: "#000000",
 };
 
 export default function RootLayout({ children }) {
@@ -21,6 +30,8 @@ export default function RootLayout({ children }) {
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <RegistrarSW />
+        <AvisoInstalar />
       </body>
     </html>
   );
