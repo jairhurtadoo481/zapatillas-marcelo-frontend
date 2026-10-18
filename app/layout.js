@@ -16,7 +16,12 @@ export const metadata = {
   },
   applicationName: "La Casa de Marcelo",
   appleWebApp: { capable: true, title: "Casa de Marcelo", statusBarStyle: "black" },
-  icons: { apple: "/apple-touch-icon.png" },
+  // Declarar "icons" aqui reemplaza al app/icon.png automatico, por eso el ícono de la
+  // pestaña se declara tambien (con un archivo liviano de 24 KB, no el de 915 KB).
+  icons: {
+    icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport = {
