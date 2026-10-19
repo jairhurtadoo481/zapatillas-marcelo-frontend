@@ -638,7 +638,22 @@ function ClienteModal({ tipo, onCerrar, onGuardado }) {
   const [buscandoDoc, setBuscandoDoc] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [clienteConocido, setClienteConocido] = useState(false);
+  // Documento cuyos datos se cargaron con "Buscar"; si se cambia el numero, esos datos ya no valen.
+  const [documentoConsultado, setDocumentoConsultado] = useState(null);
   const [error, setError] = useState("");
+
+  const cambiarDocumento = (valor) => {
+    const numero = valor.replace(/\D/g, "");
+    if (documentoConsultado !== null && numero !== documentoConsultado) {
+      // Evita dejar el nombre de otra persona junto a un documento distinto.
+      setCliente({ ...CLIENTE_VACIO, tipoDocumento: cliente.tipoDocumento, documento: numero });
+      setClienteConocido(false);
+      setDocumentoConsultado(null);
+      setError("");
+      return;
+    }
+    setCliente({ ...cliente, documento: numero });
+  };
 
   const buscarDocumento = async () => {
     const numero = cliente.documento.trim();
@@ -664,6 +679,7 @@ function ClienteModal({ tipo, onCerrar, onGuardado }) {
         referencia: data.referencia || "",
       });
       setClienteConocido(Boolean(data.esClienteConocido));
+      setDocumentoConsultado(data.documento);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -710,7 +726,7 @@ function ClienteModal({ tipo, onCerrar, onGuardado }) {
         <input
           placeholder={tipoDoc === "ruc" ? "RUC (11 digitos)" : "DNI (8 digitos)"}
           value={cliente.documento}
-          onChange={(e) => setCliente({ ...cliente, documento: e.target.value.replace(/\D/g, "") })}
+          onChange={(e) => cambiarDocumento(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 flex-1 text-sm text-gray-900"
         />
         <button
