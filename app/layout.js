@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RegistrarSW from "../components/RegistrarSW";
 import AvisoInstalar from "../components/AvisoInstalar";
+import OcultarEnComprobante from "../components/OcultarEnComprobante";
 
 const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -32,11 +33,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className={`${anton.variable} ${inter.variable} bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white`}>
-        <Navbar />
+        <OcultarEnComprobante>
+          <Navbar />
+        </OcultarEnComprobante>
         <main>{children}</main>
-        <Footer />
+        <OcultarEnComprobante>
+          <Footer />
+        </OcultarEnComprobante>
         <RegistrarSW />
-        <AvisoInstalar />
+        <OcultarEnComprobante>
+          <AvisoInstalar />
+        </OcultarEnComprobante>
       </body>
     </html>
   );
