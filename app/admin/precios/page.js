@@ -19,6 +19,8 @@ const marcas = [
   "Ni Air Running",
   "Reebok",
   "Asics",
+  "New Balance",
+  "Converse",
 ];
 
 export default function AdminPreciosPage() {

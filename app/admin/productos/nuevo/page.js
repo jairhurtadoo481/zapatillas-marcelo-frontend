@@ -22,6 +22,8 @@ const marcas = [
   "Ni Air Running",
   "Reebok",
   "Asics",
+  "New Balance",
+  "Converse",
 ];
 
 const MARCA_CON_REPLICA = "Nacionales (Marcelo)";

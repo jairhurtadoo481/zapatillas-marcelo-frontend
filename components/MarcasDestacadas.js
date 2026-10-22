@@ -19,6 +19,8 @@ const MARCAS = [
   { nombre: "Nacionales (Marcelo)", archivo: "/marcelo.png" },
   { nombre: "Reebok", archivo: "/Reeboklogo.png" },
   { nombre: "Asics", archivo: "/Asics.png" },
+  { nombre: "New Balance", archivo: "/new-balance.png" },
+  { nombre: "Converse", archivo: "/converse.png" },
 ];
 
 export default function MarcasDestacadas() {

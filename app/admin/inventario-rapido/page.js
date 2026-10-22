@@ -27,6 +27,8 @@ const marcas = [
   "Ni Air Running",
   "Reebok",
   "Asics",
+  "New Balance",
+  "Converse",
 ];
 
 const TALLAS_DEFECTO = [
